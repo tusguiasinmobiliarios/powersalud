@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerSalut — Tu Plan de Recuperación</title>
+<link rel="stylesheet" href="css/styles.css">
+<!-- Supabase SDK desde CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <span>💪</span>
+    <span>PowerSalut</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('dashboard', this)">Dashboard</button>
+    <button class="nav-tab" onclick="showSection('ejercicio', this)">Ejercicio</button>
+    <button class="nav-tab" onclick="showSection('nutricion', this)">Nutrición</button>
+    <button class="nav-tab" onclick="showSection('suplementos', this)">Suplementos</button>
+    <button class="nav-tab" onclick="showSection('medidas', this)">Medidas</button>
+    <button class="nav-tab" onclick="showSection('historial', this)">Historial</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ══════════════════════════ DASHBOARD ══ -->
+  <div id="section-dashboard" class="section active">
+    <div class="section-header">
+      <div class="section-title">Buenos días, Jose Alberto 👋</div>
+      <div class="section-sub" id="today-date"></div>
+    </div>
+
+    <div class="alert alert-blue">
+      <span>📋</span>
+      <div><strong>Semana 1 — Fase de Activación.</strong> Foco: bicicleta + core diario + rehab hombro. Meta principal: 3L de agua diarios.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Resumen del día</div>
+      <div class="grid-4">
+        <div class="metric">
+          <div class="metric-label">Agua</div>
+          <div class="metric-value" id="kpi-agua">0.0</div>
+          <div class="metric-unit">/ 3.0 L</div>
+          <div class="progress-wrap mt-8">
+            <div class="progress-bar"><div class="progress-fill fill-blue" id="bar-agua" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Proteína</div>
+          <div class="metric-value" id="kpi-prot">0</div>
+          <div class="metric-unit">/ 150 g</div>
+          <div class="progress-wrap mt-8">
+            <div class="progress-bar"><div class="progress-fill fill-green" id="bar-prot" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Ejercicio</div>
+          <div class="metric-value" id="kpi-ejercicio">0</div>
+          <div class="metric-unit">/ 45 min</div>
+          <div class="progress-wrap mt-8">
+            <div class="progress-bar"><div class="progress-fill fill-orange" id="bar-ejercicio" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Suplementos</div>
+          <div class="metric-value" id="kpi-supps">0</div>
+          <div class="metric-unit">tomados hoy</div>
+          <div class="progress-wrap mt-8">
+            <div class="progress-bar"><div class="progress-fill fill-purple" id="bar-supps" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:16px"></div>
+
+    <div class="grid-2">
+      <!-- Dolor + nota -->
+      <div class="card">
+        <div class="card-title">🩺 Dolor de hoy</div>
+        <div class="form-group">
+          <div class="form-label">Columna lumbar (0–10)</div>
+          <div class="pain-btns" id="pain-lumbar">
+            <button class="pain-btn" onclick="setPain('lumbar',0)">0</button>
+            <button class="pain-btn" onclick="setPain('lumbar',1)">1</button>
+            <button class="pain-btn" onclick="setPain('lumbar',2)">2</button>
+            <button class="pain-btn" onclick="setPain('lumbar',3)">3</button>
+            <button class="pain-btn" onclick="setPain('lumbar',4)">4</button>
+            <button class="pain-btn" onclick="setPain('lumbar',5)">5</button>
+            <button class="pain-btn" onclick="setPain('lumbar',6)">6</button>
+            <button class="pain-btn" onclick="setPain('lumbar',7)">7</button>
+            <button class="pain-btn" onclick="setPain('lumbar',8)">8</button>
+            <button class="pain-btn" onclick="setPain('lumbar',9)">9</button>
+            <button class="pain-btn" onclick="setPain('lumbar',10)">10</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Hombro derecho (0–10)</div>
+          <div class="pain-btns" id="pain-hombro">
+            <button class="pain-btn" onclick="setPain('hombro',0)">0</button>
+            <button class="pain-btn" onclick="setPain('hombro',1)">1</button>
+            <button class="pain-btn" onclick="setPain('hombro',2)">2</button>
+            <button class="pain-btn" onclick="setPain('hombro',3)">3</button>
+            <button class="pain-btn" onclick="setPain('hombro',4)">4</button>
+            <button class="pain-btn" onclick="setPain('hombro',5)">5</button>
+            <button class="pain-btn" onclick="setPain('hombro',6)">6</button>
+            <button class="pain-btn" onclick="setPain('hombro',7)">7</button>
+            <button class="pain-btn" onclick="setPain('hombro',8)">8</button>
+            <button class="pain-btn" onclick="setPain('hombro',9)">9</button>
+            <button class="pain-btn" onclick="setPain('hombro',10)">10</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Nota del día</div>
+          <textarea class="form-textarea" id="nota-dia" placeholder="¿Cómo te sentiste hoy?..." style="min-height:60px"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveDailyLog()" style="width:100%">Guardar registro</button>
+      </div>
+
+      <!-- Checklist -->
+      <div class="card">
+        <div class="card-title">✅ Lista de hoy</div>
+        <div id="daily-checklist">
+          <div class="check-item" onclick="toggleCheck(this)" data-key="bici-hoy">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <div class="check-name">Bicicleta o caminata</div>
+              <div class="check-detail">40–50 min a ritmo moderado</div>
+            </div>
+            <span class="check-badge badge-orange">Cardio</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="core-hoy">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <div class="check-name">Core — 20 minutos</div>
+              <div class="check-detail">Bird dog · Dead bug · Puente</div>
+            </div>
+            <span class="check-badge badge-blue">Columna</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="hombro-hoy">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <div class="check-name">Rehab hombro — 10 min</div>
+              <div class="check-detail">Péndulos · Retracción escapular</div>
+            </div>
+            <span class="check-badge badge-blue">Hombro</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="agua-hoy">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <div class="check-name">3 litros de agua</div>
+              <div class="check-detail">Tu agua corporal está en 49.6% — crítico</div>
+            </div>
+            <span class="check-badge badge-green">Hidratación</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="prot-hoy">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <div class="check-name">150g de proteína</div>
+              <div class="check-detail">Huevo + pollo/pescado + batido × 2</div>
+            </div>
+            <span class="check-badge badge-green">Nutrición</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="supps-hoy">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <div class="check-name">Suplementos del día</div>
+              <div class="check-detail">Omega-3 · Creatina · Magnesio · Vit D</div>
+            </div>
+            <span class="check-badge badge-blue">Suplementos</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-key="sueno-hoy">
+            <div class="check-box"></div>
+            <div class="check-text">
+              <div class="check-name">Sueño de calidad</div>
+              <div class="check-detail">7–8 horas · fundamental para recuperación</div>
+            </div>
+            <span class="check-badge">Sueño</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado actual -->
+    <div class="card">
+      <div class="card-title">📈 Estado actual vs. objetivos</div>
+      <div class="grid-4">
+        <div class="metric"><div class="metric-label">Peso</div><div class="metric-value text-orange">90.8</div><div class="metric-unit">kg</div><div class="metric-target">Meta: 82–84 kg</div><div class="metric-status warn">▼ Reducir 7 kg</div></div>
+        <div class="metric"><div class="metric-label">Grasa corporal</div><div class="metric-value text-red">30.8</div><div class="metric-unit">%</div><div class="metric-target">Meta: &lt;22%</div><div class="metric-status bad">▼ Reducir 9%</div></div>
+        <div class="metric"><div class="metric-label">Grasa visceral</div><div class="metric-value text-red">13.5</div><div class="metric-unit">nivel</div><div class="metric-target">Meta: &lt;10</div><div class="metric-status bad">🔴 Alto riesgo</div></div>
+        <div class="metric"><div class="metric-label">Masa muscular</div><div class="metric-value text-accent">59.7</div><div class="metric-unit">kg</div><div class="metric-target">Meta: 63–65 kg</div><div class="metric-status warn">▲ Aumentar</div></div>
+        <div class="metric"><div class="metric-label">Agua corporal</div><div class="metric-value text-red">49.6</div><div class="metric-unit">%</div><div class="metric-target">Meta: &gt;55%</div><div class="metric-status bad">▲ Crítico</div></div>
+        <div class="metric"><div class="metric-label">Cintura</div><div class="metric-value text-red">106</div><div class="metric-unit">cm</div><div class="metric-target">Meta: &lt;94 cm</div><div class="metric-status bad">▼ Reducir</div></div>
+        <div class="metric"><div class="metric-label">Edad metabólica</div><div class="metric-value text-red">58</div><div class="metric-unit">años</div><div class="metric-target">Meta: 43–48</div><div class="metric-status bad">▼ Revertir</div></div>
+        <div class="metric"><div class="metric-label">IMC</div><div class="metric-value text-orange">30.3</div><div class="metric-unit">kg/m²</div><div class="metric-target">Meta: 24–26</div><div class="metric-status warn">Obesidad I</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ EJERCICIO ══ -->
+  <div id="section-ejercicio" class="section">
+    <div class="section-header">
+      <div class="section-title">Plan de Ejercicio — 12 Semanas</div>
+      <div class="section-sub">Semana por semana de tu recuperación</div>
+    </div>
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)">‹</button>
+      <div class="week-info">
+        <div class="week-label" id="week-label">Semana 1</div>
+        <div class="week-phase" id="week-phase">Fase 1 — Activación</div>
+      </div>
+      <button onclick="changeWeek(1)">›</button>
+    </div>
+    <div id="week-content"></div>
+    <div class="card">
+      <div class="card-title">📝 Registrar sesión</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Actividad</label>
+          <select class="form-select" id="ej-tipo">
+            <option>Bicicleta</option><option>Caminata</option><option>Trote</option>
+            <option>Core (columna)</option><option>Rehab hombro</option>
+            <option>Gym / Fuerza</option><option>HIIT bicicleta</option>
+            <option>Natación</option><option>Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duración (min)</label>
+          <input type="number" class="form-input" id="ej-duracion" placeholder="45" min="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Intensidad</label>
+          <select class="form-select" id="ej-intensidad">
+            <option>Suave</option><option>Moderada</option><option>Fuerte</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">¿Dolor? (0–10)</label>
+          <input type="number" class="form-input" id="ej-dolor" placeholder="0" min="0" max="10">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas</label>
+        <textarea class="form-textarea" id="ej-notas" placeholder="¿Cómo fue?..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveEjercicio()">Guardar sesión</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Sesiones de hoy</div>
+      <div id="ejercicio-historial"><p class="empty-msg">Sin sesiones hoy.</p></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ NUTRICIÓN ══ -->
+  <div id="section-nutricion" class="section">
+    <div class="section-header">
+      <div class="section-title">Nutrición</div>
+      <div class="section-sub">Meta: 2.200–2.400 kcal · 150g proteína · 3L agua</div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🎯 Metas del día</div>
+        <div class="progress-wrap"><div class="progress-label"><span>Calorías</span><span id="cal-val">0 / 2.300 kcal</span></div><div class="progress-bar"><div class="progress-fill fill-orange" id="bar-cal" style="width:0%"></div></div></div>
+        <div class="progress-wrap"><div class="progress-label"><span>Proteína</span><span id="prot-val">0 / 150 g</span></div><div class="progress-bar"><div class="progress-fill fill-green" id="bar-prot2" style="width:0%"></div></div></div>
+        <div class="progress-wrap"><div class="progress-label"><span>Carbohidratos</span><span id="carb-val">0 / 240 g</span></div><div class="progress-bar"><div class="progress-fill fill-blue" id="bar-carb" style="width:0%"></div></div></div>
+        <div class="progress-wrap"><div class="progress-label"><span>Grasas</span><span id="fat-val">0 / 70 g</span></div><div class="progress-bar"><div class="progress-fill fill-purple" id="bar-fat" style="width:0%"></div></div></div>
+        <div class="progress-wrap"><div class="progress-label"><span>Agua</span><span id="agua-val">0 / 3.0 L</span></div><div class="progress-bar"><div class="progress-fill fill-blue" id="bar-agua2" style="width:0%"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🥗 Registrar comida</div>
+        <div class="form-group"><label class="form-label">Tipo</label>
+          <select class="form-select" id="comida-tipo">
+            <option>Desayuno</option><option>Media mañana</option><option>Almuerzo</option>
+            <option>Merienda</option><option>Cena</option><option>Batido proteico</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Proteína (g)</label><input type="number" class="form-input" id="c-prot" placeholder="35" min="0"></div>
+          <div class="form-group"><label class="form-label">Calorías</label><input type="number" class="form-input" id="c-cal" placeholder="400" min="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Carbos (g)</label><input type="number" class="form-input" id="c-carb" placeholder="60" min="0"></div>
+          <div class="form-group"><label class="form-label">Grasas (g)</label><input type="number" class="form-input" id="c-fat" placeholder="15" min="0"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Agua (L)</label><input type="number" class="form-input" id="c-agua" placeholder="0.5" step="0.1" min="0"></div>
+        <div class="form-group"><label class="form-label">Descripción</label><input type="text" class="form-input" id="c-desc" placeholder="Ej: 3 huevos + avena..."></div>
+        <button class="btn btn-primary" onclick="saveComida()" style="width:100%">Agregar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📌 Distribución proteica ideal</div>
+      <table>
+        <tr><th>Comida</th><th>Meta</th><th>Ejemplo</th><th>Estado</th></tr>
+        <tr><td><strong>Desayuno</strong></td><td><span class="tag badge-green">35–40 g</span></td><td class="text-muted">3–4 huevos + queso blanco o yogur griego</td><td><span id="st-desayuno" class="tag badge-orange">Pendiente</span></td></tr>
+        <tr><td><strong>Almuerzo</strong></td><td><span class="tag badge-green">45–50 g</span></td><td class="text-muted">Pechuga 180g + legumbre</td><td><span id="st-almuerzo" class="tag badge-orange">Pendiente</span></td></tr>
+        <tr><td><strong>Cena</strong></td><td><span class="tag badge-green">40–45 g</span></td><td class="text-muted">Pescado o pollo + ensalada</td><td><span id="st-cena" class="tag badge-orange">Pendiente</span></td></tr>
+        <tr><td><strong>Batido × 2</strong></td><td><span class="tag badge-green">30–40 g</span></td><td class="text-muted">2 porciones batido proteico</td><td><span id="st-batido" class="tag badge-orange">Pendiente</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">🍽️ Lo que comiste hoy</div>
+      <div id="comida-historial-hoy"><p class="empty-msg">Aún no registraste comidas hoy.</p></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ SUPLEMENTOS ══ -->
+  <div id="section-suplementos" class="section">
+    <div class="section-header">
+      <div class="section-title">Suplementos</div>
+      <div class="section-sub">Toca cada uno para marcar como tomado hoy</div>
+    </div>
+    <div class="alert alert-orange">
+      <span>⚠️</span>
+      <div><strong>Prioritario:</strong> Agrega <strong>Creatina 5g/día</strong> y hazte medir la <strong>Vitamina D</strong> en laboratorio.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Suplementos que ya tienes</div>
+      <div class="grid-3" id="supps-grid">
+        <div class="supp-item" onclick="toggleSupp(this,'omega3')" data-key="omega3"><div class="supp-check">○</div><div class="supp-name">Omega-3</div><div class="supp-dose">2–3g EPA+DHA · Con comida</div><div class="mt-8"><span class="tag badge-green">Antiinflamatorio</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'complejob')" data-key="complejob"><div class="supp-check">○</div><div class="supp-name">Complejo B</div><div class="supp-dose">Dosis del producto · Mañana</div><div class="mt-8"><span class="tag badge-blue">Nervioso</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'maca')" data-key="maca"><div class="supp-check">○</div><div class="supp-name">Maca</div><div class="supp-dose">Dosis del producto · Mañana</div><div class="mt-8"><span class="tag badge-blue">Adaptógeno</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'goldenmilk')" data-key="goldenmilk"><div class="supp-check">○</div><div class="supp-name">Golden Milk</div><div class="supp-dose">Con pimienta negra · Tarde</div><div class="mt-8"><span class="tag badge-orange">Curcumina</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'ashwagandha')" data-key="ashwagandha"><div class="supp-check">○</div><div class="supp-name">Ashwagandha</div><div class="supp-dose">300–600mg KSM-66 · Noche</div><div class="mt-8"><span class="tag badge-blue">Cortisol</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'colageno')" data-key="colageno"><div class="supp-check">○</div><div class="supp-name">Colágeno</div><div class="supp-dose">10–15g + Vit C · Ayunas</div><div class="mt-8"><span class="tag badge-green">Tendones</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'magnesio')" data-key="magnesio"><div class="supp-check">○</div><div class="supp-name">Magnesio Glicinato</div><div class="supp-dose">300–400mg · Noche</div><div class="mt-8"><span class="tag badge-blue">Sueño</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'batido')" data-key="batido"><div class="supp-check">○</div><div class="supp-name">Batido Proteico</div><div class="supp-dose">× 2 al día = 36g mínimo</div><div class="mt-8"><span class="tag badge-green">Proteína</span></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🆕 Por agregar — Alta prioridad</div>
+      <div class="grid-3">
+        <div class="supp-item" onclick="toggleSupp(this,'creatina')" data-key="creatina" style="border-color:var(--red)"><div class="supp-check">○</div><div class="supp-name">Creatina ⭐</div><div class="supp-dose">5g/día · Cualquier momento</div><div class="mt-8"><span class="tag badge-red">Prioritario</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'vitd')" data-key="vitd" style="border-color:var(--red)"><div class="supp-check">○</div><div class="supp-name">Vitamina D3 + K2 ⭐</div><div class="supp-dose">2.000–4.000 UI · Mañana</div><div class="mt-8"><span class="tag badge-red">Prioritario</span></div></div>
+        <div class="supp-item" onclick="toggleSupp(this,'vitc')" data-key="vitc"><div class="supp-check">○</div><div class="supp-name">Vitamina C</div><div class="supp-dose">500–1.000mg · Con colágeno</div><div class="mt-8"><span class="tag badge-orange">+ Colágeno</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ MEDIDAS ══ -->
+  <div id="section-medidas" class="section">
+    <div class="section-header">
+      <div class="section-title">Medidas Semanales</div>
+      <div class="section-sub">Registra cada semana en las mismas condiciones (mañana, ayunas)</div>
+    </div>
+    <div class="alert alert-blue"><span>💡</span><div>Pésate siempre <strong>por la mañana, en ayunas, sin ropa</strong>, después de ir al baño.</div></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📏 Nuevo registro</div>
+        <div class="form-group"><label class="form-label">Semana</label>
+          <select class="form-select" id="med-semana">
+            <option>Semana 1</option><option>Semana 2</option><option>Semana 3</option>
+            <option>Semana 4</option><option>Semana 5</option><option>Semana 6</option>
+            <option>Semana 7</option><option>Semana 8</option><option>Semana 9</option>
+            <option>Semana 10</option><option>Semana 11</option><option>Semana 12</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Peso (kg)</label><input type="number" class="form-input" id="med-peso" placeholder="90.8" step="0.1"></div>
+          <div class="form-group"><label class="form-label">Grasa (%)</label><input type="number" class="form-input" id="med-grasa" placeholder="30.8" step="0.1"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Músculo (kg)</label><input type="number" class="form-input" id="med-musculo" placeholder="59.7" step="0.1"></div>
+          <div class="form-group"><label class="form-label">Grasa visceral</label><input type="number" class="form-input" id="med-visceral" placeholder="13.5" step="0.1"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Agua (%)</label><input type="number" class="form-input" id="med-agua" placeholder="49.6" step="0.1"></div>
+          <div class="form-group"><label class="form-label">Edad metabólica</label><input type="number" class="form-input" id="med-edad-met" placeholder="58"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Cintura (cm)</label><input type="number" class="form-input" id="med-cintura" placeholder="106"></div>
+          <div class="form-group"><label class="form-label">Dolor lumbar (0–10)</label><input type="number" class="form-input" id="med-dolor-lumbar" placeholder="5" min="0" max="10"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Dolor hombro (0–10)</label><input type="number" class="form-input" id="med-dolor-hombro" placeholder="2" min="0" max="10"></div>
+          <div class="form-group"><label class="form-label">Energía (1–10)</label><input type="number" class="form-input" id="med-energia" placeholder="6" min="1" max="10"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Notas</label><textarea class="form-textarea" id="med-notas" placeholder="¿Cómo fue la semana?..."></textarea></div>
+        <button class="btn btn-primary" onclick="saveMedida()" style="width:100%">Guardar medidas</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Progresión — Peso</div>
+        <div id="chart-peso"><p class="empty-msg">Registra 2+ semanas para ver la gráfica.</p></div>
+        <div class="divider"></div>
+        <div class="card-title">📊 Progresión — Dolor</div>
+        <div id="chart-dolor"><p class="empty-msg">Registra 2+ semanas para ver la gráfica.</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Historial de medidas</div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Semana</th><th>Peso</th><th>Grasa%</th><th>Músculo</th>
+            <th>Visceral</th><th>Agua%</th><th>Ed.Met</th><th>Cintura</th>
+            <th>D.Lumbar</th><th>D.Hombro</th><th>Energía</th>
+          </tr></thead>
+          <tbody id="medidas-tabla">
+            <tr><td colspan="11" class="empty-msg" style="text-align:center;padding:20px">Aquí aparecerán tus registros.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ HISTORIAL ══ -->
+  <div id="section-historial" class="section">
+    <div class="section-header">
+      <div class="section-title">Historial</div>
+      <div class="section-sub">Últimos 30 registros de cada categoría</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Registros diarios</div>
+      <div id="historial-lista"><p class="empty-msg">Cargando...</p></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏃 Historial de ejercicio</div>
+      <div id="historial-ejercicio-full"><p class="empty-msg">Cargando...</p></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<div id="toast">✅ Guardado</div>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
