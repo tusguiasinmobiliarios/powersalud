@@ -598,24 +598,35 @@ async function saveMedida(){
   await loadMedidas();renderMedTable();renderCharts();
   document.getElementById('m-notas').value='';toast('📊 Medidas guardadas');
 }
+function dc(v){return (v||0)>=5?"var(--rd)":(v||0)>=3?"var(--or)":"var(--gr)";}
+function dc(v){return (v||0)>=5?"var(--rd)":(v||0)>=3?"var(--or)":"var(--gr)";}
 function renderMedTable(){
-  const tb=document.getElementById('med-tabla');
-  if(!S.medidas.length){tb.innerHTML='<tr><td colspan="11" class="em">Aquí aparecerán tus registros.</td></tr>';return;}
-  const base=S.medidas[0];
-  const df=(v,b,low)=>{if(v==null||b==null)return'';const d=v-b;if(Math.abs(d)<0.05)return'';const ok=low?d<0:d>0;return`<span style="font-size:10px;color:${ok?'var(--gr)':'var(--rd)'}"> ${d>0?'+':''}${Math.abs(d)<10?d.toFixed(1):Math.round(d)}</span>`;};
-  tb.innerHTML=S.medidas.map((m,i)=>`<tr>
-    <td><strong>${m.semana}</strong><br><span style="font-size:10px;color:var(--mu)">${m.fecha}</span></td>
-    <td>${fmt(m.peso,1)}${i>0?df(m.peso,base.peso,true):''}</td>
-    <td>${fmt(m.grasa_corporal,1)}%${i>0?df(m.grasa_corporal,base.grasa_corporal,true):''}</td>
-    <td>${fmt(m.masa_muscular,1)}${i>0?df(m.masa_muscular,base.masa_muscular,false):''}</td>
-    <td>${fmt(m.grasa_visceral,1)}${i>0?df(m.grasa_visceral,base.grasa_visceral,true):''}</td>
-    <td>${fmt(m.agua_corporal,1)}%${i>0?df(m.agua_corporal,base.agua_corporal,false):''}</td>
-    <td>${m.edad_metabolica||'—'}${i>0?df(m.edad_metabolica,base.edad_metabolica,true):''}</td>
-    <td>${fmt(m.cintura,0)}${i>0?df(m.cintura,base.cintura,true):''}</td>
-    <td><span style="color:${(m.dolor_lumbar||0)>=5?'var(--rd)':(m.dolor_lumbar||0)>=3?'var(--or)':'var(--gr)'">${m.dolor_lumbar??'—'}/10</span></td>
-    <td><span style="color:${(m.dolor_hombro||0)>=5?'var(--rd)':(m.dolor_hombro||0)>=3?'var(--or)':'var(--gr)'">${m.dolor_hombro??'—'}/10</span></td>
-    <td><span style="color:var(--ac)">${m.energia??'—'}/10</span></td>
-  </tr>`).join('');
+  var tb=document.getElementById("med-tabla");
+  if(!S.medidas.length){tb.innerHTML="<tr><td colspan=11 class=em>Aqui apareceran tus registros.</td></tr>";return;}
+  var base=S.medidas[0];
+  function df(v,b,low){
+    if(v==null||b==null)return"";
+    var d=v-b;
+    if(Math.abs(d)<0.05)return"";
+    var ok=low?d<0:d>0;
+    var col=ok?"var(--gr)":"var(--rd)";
+    return"<span style=color:"+col+">"+(d>0?"+":"")+(Math.abs(d)<10?d.toFixed(1):Math.round(d))+"</span>";
+  }
+  tb.innerHTML=S.medidas.map(function(m,i){
+    return "<tr>"+
+      "<td><strong>"+m.semana+"</strong><br><span style=font-size:10px;color:var(--mu)>"+m.fecha+"</span></td>"+
+      "<td>"+fmt(m.peso,1)+(i>0?df(m.peso,base.peso,true):"")+"</td>"+
+      "<td>"+fmt(m.grasa_corporal,1)+"%"+(i>0?df(m.grasa_corporal,base.grasa_corporal,true):"")+"</td>"+
+      "<td>"+fmt(m.masa_muscular,1)+(i>0?df(m.masa_muscular,base.masa_muscular,false):"")+"</td>"+
+      "<td>"+fmt(m.grasa_visceral,1)+(i>0?df(m.grasa_visceral,base.grasa_visceral,true):"")+"</td>"+
+      "<td>"+fmt(m.agua_corporal,1)+"%"+(i>0?df(m.agua_corporal,base.agua_corporal,false):"")+"</td>"+
+      "<td>"+(m.edad_metabolica||"—")+(i>0?df(m.edad_metabolica,base.edad_metabolica,true):"")+"</td>"+
+      "<td>"+fmt(m.cintura,0)+(i>0?df(m.cintura,base.cintura,true):"")+"</td>"+
+      "<td><span style=color:"+dc(m.dolor_lumbar)+">"+(m.dolor_lumbar!=null?m.dolor_lumbar:"—")+"/10</span></td>"+
+      "<td><span style=color:"+dc(m.dolor_hombro)+">"+(m.dolor_hombro!=null?m.dolor_hombro:"—")+"/10</span></td>"+
+      "<td><span style=color:var(--ac)>"+(m.energia!=null?m.energia:"—")+"/10</span></td>"+
+    "</tr>";
+  }).join("");
 }
 function renderCharts(){
   if(S.medidas.length<2)return;
