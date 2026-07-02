@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PowerSalut</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+:root{--bg:#0f1117;--s:#1a1d27;--s2:#22263a;--b:#2e3350;--ac:#4f8ef7;--ac2:#7c5cbf;--gr:#34c97e;--or:#f5a623;--rd:#e05c5c;--tx:#e8eaf0;--mu:#7a8099}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px}
+#lo{position:fixed;inset:0;background:rgba(15,17,23,.9);display:flex;align-items:center;justify-content:center;z-index:9999}
+.sp{width:42px;height:42px;border:3px solid var(--b);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+nav{background:var(--s);border-bottom:1px solid var(--b);padding:0 12px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nb{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:var(--ac)}
+.nt{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nt::-webkit-scrollbar{display:none}
+.ntb{background:none;border:none;color:var(--mu);padding:7px 11px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:all .2s}
+.ntb.active,.ntb:hover{background:var(--s2);color:var(--tx)}
+.ntb.active{color:var(--ac)}
+.ct{max-width:1000px;margin:0 auto;padding:16px 12px}
+.sec{display:none}.sec.active{display:block}
+.card{background:var(--s);border:1px solid var(--b);border-radius:14px;padding:16px;margin-bottom:14px}
+.ct2{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+@media(max-width:600px){.g2{grid-template-columns:1fr}.g3,.g4{grid-template-columns:1fr 1fr}}
+.met{background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:14px;text-align:center}
+.ml{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.mv{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700}
+.mu2{font-size:11px;color:var(--mu)}
+.mt{font-size:10px;color:var(--ac);margin-top:3px}
+.ms{font-size:10px;margin-top:3px;font-weight:700}
+.pw{margin:7px 0}
+.pl{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:3px}
+.pb{height:6px;background:var(--s2);border-radius:99px;overflow:hidden}
+.pf{height:100%;border-radius:99px;transition:width .6s ease}
+.fg{background:var(--gr)}.fo{background:var(--or)}.fb{background:var(--ac)}.fp{background:var(--ac2)}
+.fo2{color:var(--or)}.fr2{color:var(--rd)}.fa2{color:var(--ac)}.fg2{color:var(--gr)}
+.fmg{margin-bottom:12px}
+.flab{display:block;font-size:11px;color:var(--mu);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.fi,.fsel,.fta{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--tx);padding:10px 12px;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.fi:focus,.fsel:focus,.fta:focus{border-color:var(--ac)}
+.fta{resize:vertical;min-height:72px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.fr{grid-template-columns:1fr}}
+.btn{padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;transition:all .2s}
+.bp{background:var(--ac);color:#fff;width:100%;margin-top:4px}
+.bp:hover{background:#3a7de8}
+.ci{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer}
+.ci:last-child{border-bottom:none}
+.ci.done{opacity:.5}
+.cb{width:22px;height:22px;min-width:22px;border-radius:6px;border:2px solid var(--b);display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px;flex-shrink:0}
+.ci.done .cb{background:var(--gr);border-color:var(--gr)}
+.ci.done .cb::after{content:'✓';font-size:12px;color:#fff;font-weight:700}
+.cn{font-size:13px;font-weight:600}.cd{font-size:11px;color:var(--mu);margin-top:2px}
+.cbg{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;background:var(--s2);color:var(--mu);white-space:nowrap;margin-left:auto;flex-shrink:0}
+.bdr{background:rgba(224,92,92,.15);color:var(--rd)}
+.bor{background:rgba(245,166,35,.15);color:var(--or)}
+.bgr{background:rgba(52,201,126,.15);color:var(--gr)}
+.bbl{background:rgba(79,142,247,.15);color:var(--ac)}
+.bpu{background:rgba(124,92,191,.15);color:var(--ac2)}
+/* EJERCICIO */
+.phase-banner{background:linear-gradient(135deg,rgba(79,142,247,.15),rgba(124,92,191,.15));border:1px solid rgba(79,142,247,.3);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.phase-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px}
+.phase-sub{font-size:12px;color:#8bb8ff}
+.week-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+.week-tabs::-webkit-scrollbar{display:none}
+.wtab{padding:7px 13px;border-radius:8px;border:1px solid var(--b);background:var(--s2);color:var(--mu);cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.wtab.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.wtab.current{border-color:var(--gr);color:var(--gr)}
+.wtab.active.current{background:var(--gr);border-color:var(--gr);color:#0a1a0f}
+.day-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.dtab{padding:7px 12px;border-radius:8px;border:1px solid var(--b);background:var(--s2);color:var(--mu);cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:all .2s}
+.dtab.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.dtab.today{border-color:var(--or);color:var(--or)}
+.dtab.active.today{background:var(--or);color:#0a1a0f;border-color:var(--or)}
+.dtab.rest-day{opacity:.5;border-style:dashed}
+/* EJ CARD */
+.ej-card{background:var(--s2);border:1px solid var(--b);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.ej-card.done-ej{border-color:var(--gr)}
+.ej-head{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer}
+.ej-chk{width:26px;height:26px;min-width:26px;border-radius:7px;border:2px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;transition:all .2s}
+.ej-card.done-ej .ej-chk{background:var(--gr);border-color:var(--gr);color:#fff}
+.ej-nm{font-size:13px;font-weight:700;flex:1}
+.ej-mt{font-size:11px;color:var(--mu);margin-top:2px}
+.ej-cat{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;flex-shrink:0}
+.ej-arr{font-size:16px;color:var(--mu);transition:transform .2s;flex-shrink:0;margin-left:6px}
+.ej-card.open .ej-arr{transform:rotate(180deg)}
+.ej-body{display:none;border-top:1px solid var(--b);padding:14px}
+.ej-card.open .ej-body{display:block}
+.step{display:flex;gap:10px;margin-bottom:9px;font-size:13px;line-height:1.5}
+.stepn{width:22px;height:22px;min-width:22px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:2px;flex-shrink:0}
+.tip-box{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:#8bb8ff;margin-top:8px}
+.mark-btn{width:100%;margin-top:12px;padding:11px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .2s}
+.mpend{background:var(--ac);color:#fff}
+.mcomp{background:rgba(52,201,126,.12);color:var(--gr);border:1px solid var(--gr)}
+/* COMPLIANCE */
+.comp-bar{height:10px;background:var(--s2);border-radius:99px;overflow:hidden;margin:6px 0}
+.comp-fill{height:100%;border-radius:99px;transition:width .8s ease}
+.wrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b)}
+.wrow:last-child{border-bottom:none}
+.wnm{font-size:12px;font-weight:600;min-width:80px}
+.wbr{flex:1}
+.wpct{font-size:13px;font-weight:700;min-width:40px;text-align:right}
+/* SUMMARY */
+.sum-card{background:linear-gradient(135deg,rgba(79,142,247,.08),rgba(124,92,191,.08));border:1px solid rgba(79,142,247,.25);border-radius:14px;padding:16px;margin-bottom:14px}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.sum-row:last-child{border-bottom:none}
+/* REST */
+.rest-box{text-align:center;padding:40px 20px}
+.rest-icon{font-size:48px;margin-bottom:12px}
+/* MISC */
+.si{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:11px;display:flex;flex-direction:column;gap:5px;cursor:pointer;transition:all .2s;position:relative}
+.si.taken{border-color:var(--gr);background:rgba(52,201,126,.07)}
+.sn{font-size:12px;font-weight:700}.sd{font-size:10px;color:var(--mu)}.sc{position:absolute;top:7px;right:9px;font-size:15px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700}
+.hi{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.hd{font-size:10px;color:var(--mu);min-width:76px}.hb{flex:1}
+.sh{margin-bottom:16px}
+.st{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin-bottom:3px}
+.ss{color:var(--mu);font-size:12px}
+.al{border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:12px;display:flex;gap:8px;align-items:flex-start}
+.alb{background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.3);color:#8bb8ff}
+.alo{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);color:#f5c842}
+.div{height:1px;background:var(--b);margin:14px 0}
+.em{color:var(--mu);font-size:12px;text-align:center;padding:18px}
+.fw{font-weight:700}.mt6{margin-top:6px}.ok{color:var(--gr)}.wn2{color:var(--or)}.bd{color:var(--rd)}
+.pb2{display:flex;gap:4px;flex-wrap:wrap}
+.pbb{width:34px;height:34px;border-radius:7px;border:2px solid var(--b);background:var(--s2);color:var(--tx);font-weight:700;font-size:12px;cursor:pointer;transition:all .15s}
+.pbb.sp2{border-color:var(--ac);background:var(--ac);color:#fff}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gr);color:#0a1a0f;padding:11px 22px;border-radius:99px;font-weight:700;font-size:13px;z-index:9999;transition:transform .3s;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--s2);color:var(--mu);text-align:left;padding:8px 10px;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+td{padding:10px 10px;border-bottom:1px solid var(--b);vertical-align:top}
+tr:last-child td{border-bottom:none}
+</style>
+</head>
+<body>
+<div id="lo"><div class="sp"></div></div>
+<nav>
+  <div class="nb">💪 PowerSalut</div>
+  <div class="nt">
+    <button class="ntb active" onclick="showSec('dashboard',this)">Dashboard</button>
+    <button class="ntb" onclick="showSec('ejercicio',this)">Ejercicio</button>
+    <button class="ntb" onclick="showSec('nutricion',this)">Nutrición</button>
+    <button class="ntb" onclick="showSec('suplementos',this)">Suplementos</button>
+    <button class="ntb" onclick="showSec('medidas',this)">Medidas</button>
+    <button class="ntb" onclick="showSec('historial',this)">Historial</button>
+  </div>
+</nav>
+<div class="ct">
+
+<!-- DASHBOARD -->
+<div id="sec-dashboard" class="sec active">
+  <div class="sh"><div class="st">Hola, Jose Alberto 👋</div><div class="ss" id="today-date"></div></div>
+  <div class="al alb">📋 <div id="dash-phase-msg">Cargando plan...</div></div>
+  <div class="card">
+    <div class="ct2">📊 Resumen del día</div>
+    <div class="g4">
+      <div class="met"><div class="ml">Agua</div><div class="mv" id="kpi-agua">0.0</div><div class="mu2">/ 3.0 L</div><div class="pw"><div class="pb"><div class="pf fb" id="bar-agua" style="width:0%"></div></div></div></div>
+      <div class="met"><div class="ml">Proteína</div><div class="mv" id="kpi-prot">0</div><div class="mu2">/ 150 g</div><div class="pw"><div class="pb"><div class="pf fg" id="bar-prot" style="width:0%"></div></div></div></div>
+      <div class="met"><div class="ml">Ejercicios</div><div class="mv" id="kpi-ej">0</div><div class="mu2" id="kpi-ej-of">/ 0 hoy</div><div class="pw"><div class="pb"><div class="pf fo" id="bar-ej" style="width:0%"></div></div></div></div>
+      <div class="met"><div class="ml">Suplement.</div><div class="mv" id="kpi-su">0</div><div class="mu2">tomados</div><div class="pw"><div class="pb"><div class="pf fp" id="bar-su" style="width:0%"></div></div></div></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct2">🩺 Dolor hoy</div>
+      <div class="fmg"><div class="flab">Columna lumbar (0–10)</div>
+        <div class="pb2" id="pain-lumbar">
+          <button class="pbb" onclick="setPain('lumbar',0)">0</button><button class="pbb" onclick="setPain('lumbar',1)">1</button><button class="pbb" onclick="setPain('lumbar',2)">2</button><button class="pbb" onclick="setPain('lumbar',3)">3</button><button class="pbb" onclick="setPain('lumbar',4)">4</button><button class="pbb" onclick="setPain('lumbar',5)">5</button><button class="pbb" onclick="setPain('lumbar',6)">6</button><button class="pbb" onclick="setPain('lumbar',7)">7</button><button class="pbb" onclick="setPain('lumbar',8)">8</button><button class="pbb" onclick="setPain('lumbar',9)">9</button><button class="pbb" onclick="setPain('lumbar',10)">10</button>
+        </div>
+      </div>
+      <div class="fmg"><div class="flab">Hombro derecho (0–10)</div>
+        <div class="pb2" id="pain-hombro">
+          <button class="pbb" onclick="setPain('hombro',0)">0</button><button class="pbb" onclick="setPain('hombro',1)">1</button><button class="pbb" onclick="setPain('hombro',2)">2</button><button class="pbb" onclick="setPain('hombro',3)">3</button><button class="pbb" onclick="setPain('hombro',4)">4</button><button class="pbb" onclick="setPain('hombro',5)">5</button><button class="pbb" onclick="setPain('hombro',6)">6</button><button class="pbb" onclick="setPain('hombro',7)">7</button><button class="pbb" onclick="setPain('hombro',8)">8</button><button class="pbb" onclick="setPain('hombro',9)">9</button><button class="pbb" onclick="setPain('hombro',10)">10</button>
+        </div>
+      </div>
+      <div class="fmg"><div class="flab">Nota del día</div><textarea class="fta" id="nota-dia" placeholder="¿Cómo te sentiste hoy?..." style="min-height:60px"></textarea></div>
+      <button class="btn bp" onclick="saveDailyLog()">Guardar registro</button>
+    </div>
+    <div class="card">
+      <div class="ct2">✅ Lista de hoy</div>
+      <div id="daily-checklist">
+        <div class="ci" onclick="toggleCheck(this)" data-key="ej-hoy"><div class="cb"></div><div><div class="cn">Sesión de ejercicio</div><div class="cd">Ver plan en la sección Ejercicio</div></div><span class="cbg bor">Fitness</span></div>
+        <div class="ci" onclick="toggleCheck(this)" data-key="agua-hoy"><div class="cb"></div><div><div class="cn">3 litros de agua</div><div class="cd">Tu agua está en 49.6% — crítico</div></div><span class="cbg bgr">Agua</span></div>
+        <div class="ci" onclick="toggleCheck(this)" data-key="prot-hoy"><div class="cb"></div><div><div class="cn">150g de proteína</div><div class="cd">Huevo + pollo/pescado + batido x2</div></div><span class="cbg bgr">Nutrición</span></div>
+        <div class="ci" onclick="toggleCheck(this)" data-key="supps-hoy"><div class="cb"></div><div><div class="cn">Suplementos del día</div><div class="cd">Omega-3 · Creatina · Mag · Vit D</div></div><span class="cbg bbl">Suplem.</span></div>
+        <div class="ci" onclick="toggleCheck(this)" data-key="sueno-hoy"><div class="cb"></div><div><div class="cn">Sueño de calidad</div><div class="cd">7–8 horas — fundamental para recuperación</div></div><span class="cbg">Sueño</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct2">📈 Estado actual vs. objetivos</div>
+    <div class="g4">
+      <div class="met"><div class="ml">Peso</div><div class="mv fo2">90.8</div><div class="mu2">kg</div><div class="mt">Meta: 82–84 kg</div><div class="ms wn2">▼ −7 kg</div></div>
+      <div class="met"><div class="ml">Grasa</div><div class="mv fr2">30.8</div><div class="mu2">%</div><div class="mt">Meta: &lt;22%</div><div class="ms bd">▼ −9%</div></div>
+      <div class="met"><div class="ml">Visceral</div><div class="mv fr2">13.5</div><div class="mu2">nivel</div><div class="mt">Meta: &lt;10</div><div class="ms bd">🔴 Alto</div></div>
+      <div class="met"><div class="ml">Músculo</div><div class="mv fa2">59.7</div><div class="mu2">kg</div><div class="mt">Meta: 63–65</div><div class="ms wn2">▲ +4 kg</div></div>
+      <div class="met"><div class="ml">Agua</div><div class="mv fr2">49.6</div><div class="mu2">%</div><div class="mt">Meta: &gt;55%</div><div class="ms bd">▲ Crítico</div></div>
+      <div class="met"><div class="ml">Cintura</div><div class="mv fr2">106</div><div class="mu2">cm</div><div class="mt">Meta: &lt;94 cm</div><div class="ms bd">▼ −12 cm</div></div>
+      <div class="met"><div class="ml">Ed. Met.</div><div class="mv fr2">58</div><div class="mu2">años</div><div class="mt">Meta: 43–48</div><div class="ms bd">▼ Revertir</div></div>
+      <div class="met"><div class="ml">IMC</div><div class="mv fo2">30.3</div><div class="mu2">kg/m²</div><div class="mt">Meta: 24–26</div><div class="ms wn2">Obesidad I</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- EJERCICIO -->
+<div id="sec-ejercicio" class="sec">
+  <div class="sh"><div class="st">Plan de Ejercicio</div><div class="ss">12 semanas · 6 días activos · comenzó 29 Jun 2026</div></div>
+  <div class="phase-banner" id="phase-banner">
+    <div class="phase-title" id="phase-title">Cargando...</div>
+    <div class="phase-sub" id="phase-sub"></div>
+  </div>
+  <!-- Selector de semana -->
+  <div class="ct2" style="margin-bottom:8px">📅 Selecciona la semana</div>
+  <div class="week-tabs" id="week-tabs"></div>
+  <!-- Selector de día -->
+  <div class="day-tabs" id="day-tabs"></div>
+  <!-- Contenido del día -->
+  <div id="day-content"></div>
+  <!-- Resumen del día -->
+  <div id="day-summary"></div>
+  <!-- Cumplimiento -->
+  <div class="card">
+    <div class="ct2">📊 Cumplimiento — Últimas 4 semanas</div>
+    <div id="compliance-chart"><p class="em">Completa ejercicios para ver tu progreso.</p></div>
+  </div>
+</div>
+
+<!-- NUTRICIÓN -->
+<div id="sec-nutricion" class="sec">
+  <div class="sh"><div class="st">Nutrición</div><div class="ss">Meta: 2.200–2.400 kcal · 150g proteína · 3L agua</div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct2">🎯 Metas del día</div>
+      <div class="pw"><div class="pl"><span>Calorías</span><span id="cal-val">0 / 2.300 kcal</span></div><div class="pb"><div class="pf fo" id="bar-cal" style="width:0%"></div></div></div>
+      <div class="pw"><div class="pl"><span>Proteína</span><span id="prot-val">0 / 150 g</span></div><div class="pb"><div class="pf fg" id="bar-prot2" style="width:0%"></div></div></div>
+      <div class="pw"><div class="pl"><span>Carbohidratos</span><span id="carb-val">0 / 240 g</span></div><div class="pb"><div class="pf fb" id="bar-carb" style="width:0%"></div></div></div>
+      <div class="pw"><div class="pl"><span>Grasas</span><span id="fat-val">0 / 70 g</span></div><div class="pb"><div class="pf fp" id="bar-fat" style="width:0%"></div></div></div>
+      <div class="pw"><div class="pl"><span>Agua</span><span id="agua-val">0 / 3.0 L</span></div><div class="pb"><div class="pf fb" id="bar-agua2" style="width:0%"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="ct2">🥗 Registrar comida</div>
+      <div class="fmg"><label class="flab">Tipo</label>
+        <select class="fsel" id="c-tipo"><option>Desayuno</option><option>Media mañana</option><option>Almuerzo</option><option>Merienda</option><option>Cena</option><option>Batido proteico</option></select>
+      </div>
+      <div class="fr">
+        <div class="fmg"><label class="flab">Proteína (g)</label><input type="number" class="fi" id="c-prot" placeholder="35" min="0"></div>
+        <div class="fmg"><label class="flab">Calorías</label><input type="number" class="fi" id="c-cal" placeholder="400" min="0"></div>
+      </div>
+      <div class="fr">
+        <div class="fmg"><label class="flab">Carbos (g)</label><input type="number" class="fi" id="c-carb" placeholder="60" min="0"></div>
+        <div class="fmg"><label class="flab">Grasas (g)</label><input type="number" class="fi" id="c-fat" placeholder="15" min="0"></div>
+      </div>
+      <div class="fmg"><label class="flab">Agua (L)</label><input type="number" class="fi" id="c-agua" placeholder="0.5" step="0.1" min="0"></div>
+      <div class="fmg"><label class="flab">Descripción</label><input type="text" class="fi" id="c-desc" placeholder="Ej: 3 huevos + avena..."></div>
+      <button class="btn bp" onclick="saveComida()">Agregar</button>
+    </div>
+  </div>
+  <div class="card"><div class="ct2">📌 Proteína por comida</div>
+    <div class="ci"><div class="cb" style="border:none;background:none"></div><div><div class="cn">Desayuno: 35–40g</div><div class="cd">3–4 huevos + queso blanco o yogur griego</div></div><span class="cbg bgr" id="st-desayuno">Pendiente</span></div>
+    <div class="ci"><div class="cb" style="border:none;background:none"></div><div><div class="cn">Almuerzo: 45–50g</div><div class="cd">Pechuga 180g + legumbre</div></div><span class="cbg bgr" id="st-almuerzo">Pendiente</span></div>
+    <div class="ci"><div class="cb" style="border:none;background:none"></div><div><div class="cn">Cena: 40–45g</div><div class="cd">Pescado o pollo + ensalada</div></div><span class="cbg bgr" id="st-cena">Pendiente</span></div>
+    <div class="ci"><div class="cb" style="border:none;background:none"></div><div><div class="cn">Batido x2: 30–40g</div><div class="cd">2 porciones del batido proteico</div></div><span class="cbg bgr" id="st-batido">Pendiente</span></div>
+  </div>
+  <div class="card"><div class="ct2">🍽️ Lo que comiste hoy</div><div id="comida-hoy"><p class="em">Aún no registraste comidas.</p></div></div>
+</div>
+
+<!-- SUPLEMENTOS -->
+<div id="sec-suplementos" class="sec">
+  <div class="sh"><div class="st">Suplementos</div><div class="ss">Toca cada uno para marcar como tomado hoy</div></div>
+  <div class="al alo">⚠️ <div><strong>Prioritario:</strong> Agrega <strong>Creatina 5g/día</strong> y mide tu <strong>Vitamina D</strong> en laboratorio.</div></div>
+  <div class="card"><div class="ct2">✅ Los que ya tienes</div>
+    <div class="g3">
+      <div class="si" onclick="toggleSupp(this,'omega3')" data-key="omega3"><div class="sc">○</div><div class="sn">Omega-3</div><div class="sd">2–3g EPA+DHA · Con comida</div><div class="mt6"><span class="tag bgr">Antiinflam.</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'complejob')" data-key="complejob"><div class="sc">○</div><div class="sn">Complejo B</div><div class="sd">Dosis producto · Mañana</div><div class="mt6"><span class="tag bbl">Nervioso</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'maca')" data-key="maca"><div class="sc">○</div><div class="sn">Maca</div><div class="sd">Dosis producto · Mañana</div><div class="mt6"><span class="tag bbl">Adaptóg.</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'goldenmilk')" data-key="goldenmilk"><div class="sc">○</div><div class="sn">Golden Milk</div><div class="sd">Con pimienta negra · Tarde</div><div class="mt6"><span class="tag bor">Curcumina</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'ashwagandha')" data-key="ashwagandha"><div class="sc">○</div><div class="sn">Ashwagandha</div><div class="sd">300–600mg KSM-66 · Noche</div><div class="mt6"><span class="tag bbl">Cortisol</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'colageno')" data-key="colageno"><div class="sc">○</div><div class="sn">Colágeno</div><div class="sd">10–15g + Vit C · Ayunas</div><div class="mt6"><span class="tag bgr">Tendones</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'magnesio')" data-key="magnesio"><div class="sc">○</div><div class="sn">Mag. Glicinato</div><div class="sd">300–400mg · Noche</div><div class="mt6"><span class="tag bbl">Sueño</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'batido')" data-key="batido"><div class="sc">○</div><div class="sn">Batido Proteico</div><div class="sd">x2 al día = 36g mínimo</div><div class="mt6"><span class="tag bgr">Proteína</span></div></div>
+    </div>
+  </div>
+  <div class="card"><div class="ct2">🆕 Por agregar — Alta prioridad</div>
+    <div class="g3">
+      <div class="si" onclick="toggleSupp(this,'creatina')" data-key="creatina" style="border-color:var(--rd)"><div class="sc">○</div><div class="sn">Creatina ⭐</div><div class="sd">5g/día · Cualquier hora</div><div class="mt6"><span class="tag bdr">Prioritario</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'vitd')" data-key="vitd" style="border-color:var(--rd)"><div class="sc">○</div><div class="sn">Vit D3 + K2 ⭐</div><div class="sd">2.000–4.000 UI · Mañana</div><div class="mt6"><span class="tag bdr">Prioritario</span></div></div>
+      <div class="si" onclick="toggleSupp(this,'vitc')" data-key="vitc"><div class="sc">○</div><div class="sn">Vitamina C</div><div class="sd">500–1.000mg · Con colágeno</div><div class="mt6"><span class="tag bor">+Colágeno</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MEDIDAS -->
+<div id="sec-medidas" class="sec">
+  <div class="sh"><div class="st">Medidas Semanales</div><div class="ss">Mismo día y hora — mañana en ayunas</div></div>
+  <div class="al alb">💡 <div>Pésate <strong>por la mañana, en ayunas, sin ropa</strong>, después de ir al baño.</div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct2">📏 Nuevo registro</div>
+      <div class="fmg"><label class="flab">Semana</label>
+        <select class="fsel" id="med-sem"><option>Semana 1</option><option>Semana 2</option><option>Semana 3</option><option>Semana 4</option><option>Semana 5</option><option>Semana 6</option><option>Semana 7</option><option>Semana 8</option><option>Semana 9</option><option>Semana 10</option><option>Semana 11</option><option>Semana 12</option></select>
+      </div>
+      <div class="fr"><div class="fmg"><label class="flab">Peso (kg)</label><input type="number" class="fi" id="m-peso" placeholder="90.8" step="0.1"></div><div class="fmg"><label class="flab">Grasa (%)</label><input type="number" class="fi" id="m-grasa" placeholder="30.8" step="0.1"></div></div>
+      <div class="fr"><div class="fmg"><label class="flab">Músculo (kg)</label><input type="number" class="fi" id="m-musc" placeholder="59.7" step="0.1"></div><div class="fmg"><label class="flab">Visceral</label><input type="number" class="fi" id="m-visc" placeholder="13.5" step="0.1"></div></div>
+      <div class="fr"><div class="fmg"><label class="flab">Agua (%)</label><input type="number" class="fi" id="m-agua" placeholder="49.6" step="0.1"></div><div class="fmg"><label class="flab">Ed. Metabólica</label><input type="number" class="fi" id="m-edm" placeholder="58"></div></div>
+      <div class="fr"><div class="fmg"><label class="flab">Cintura (cm)</label><input type="number" class="fi" id="m-cin" placeholder="106"></div><div class="fmg"><label class="flab">Dolor lumbar (0–10)</label><input type="number" class="fi" id="m-dl" placeholder="5" min="0" max="10"></div></div>
+      <div class="fr"><div class="fmg"><label class="flab">Dolor hombro (0–10)</label><input type="number" class="fi" id="m-dh" placeholder="2" min="0" max="10"></div><div class="fmg"><label class="flab">Energía (1–10)</label><input type="number" class="fi" id="m-en" placeholder="6" min="1" max="10"></div></div>
+      <div class="fmg"><label class="flab">Notas</label><textarea class="fta" id="m-notas" placeholder="¿Cómo fue la semana?..."></textarea></div>
+      <button class="btn bp" onclick="saveMedida()">Guardar medidas</button>
+    </div>
+    <div class="card">
+      <div class="ct2">📊 Progresión — Peso</div>
+      <div id="chart-peso"><p class="em">Registra 2+ semanas para ver la gráfica.</p></div>
+      <div class="div"></div>
+      <div class="ct2">📊 Progresión — Dolor</div>
+      <div id="chart-dolor"><p class="em">Registra 2+ semanas para ver la gráfica.</p></div>
+    </div>
+  </div>
+  <div class="card"><div class="ct2">📋 Historial de medidas</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Semana</th><th>Peso</th><th>Grasa%</th><th>Músculo</th><th>Visceral</th><th>Agua%</th><th>Ed.Met</th><th>Cintura</th><th>D.Lumb</th><th>D.Homb</th><th>Energía</th></tr></thead>
+        <tbody id="med-tabla"><tr><td colspan="11" class="em">Aquí aparecerán tus registros.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORIAL -->
+<div id="sec-historial" class="sec">
+  <div class="sh"><div class="st">Historial</div><div class="ss">Últimos 30 registros</div></div>
+  <div class="card"><div class="ct2">📅 Registros diarios</div><div id="hist-logs"><p class="em">Cargando...</p></div></div>
+  <div class="card"><div class="ct2">🏃 Ejercicio completado</div><div id="hist-ej"><p class="em">Cargando...</p></div></div>
+</div>
+
+</div>
+<div id="toast">✅ Guardado</div>
+
+<script>
+var SB_URL='https://edqgdvqpthjnckzzyvkk.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkcWdkdnFwdGhqbmNrenp5dmtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NzgwOTUsImV4cCI6MjA5ODE1NDA5NX0.l0jj7OVZSc3exyadckAwXkA8nsm9bHNl6R8q308ZNAs';
+var db=supabase.createClient(SB_URL,SB_KEY);
+
+// ESTADO
+var S={macros:{cal:0,prot:0,carb:0,fat:0,agua:0},supps:{},checks:{},dolor:{lumbar:null,hombro:null},ejLog:{},medidas:[],viewSem:1,viewDow:1};
+var TODAY=new Date().toISOString().slice(0,10);
+var PLAN_START=new Date('2026-06-29T12:00:00');
+var DIAS=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+var DIAS_ES=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var DOW_TODAY=new Date().getDay();
+
+function fmt(n,d){d=d===undefined?1:d;return(isNaN(n)||n==null)?'—':Number(n).toFixed(d);}
+function loading(v){document.getElementById('lo').style.display=v?'flex':'none';}
+function toast(m,c){c=c||'var(--gr)';var t=document.getElementById('toast');t.textContent=m;t.style.background=c;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);}
+
+function getSemActual(){
+  var now=new Date(TODAY+'T12:00:00');
+  var diff=Math.floor((now-PLAN_START)/(7*24*3600*1000));
+  return Math.min(Math.max(diff+1,1),12);
+}
+
+function getFaseInfo(sem){
+  if(sem<=4)return{num:1,nombre:'Fase 1 — Activación y Control del Dolor',color:'#4f8ef7',objetivo:'Activar el core, movilizar el hombro, quemar grasa con cardio suave. Sin dolor adicional.'};
+  if(sem<=8)return{num:2,nombre:'Fase 2 — Fortalecimiento Progresivo',color:'#f5a623',objetivo:'Ganar fuerza funcional, aumentar músculo paraespinal, reducir grasa visceral con HIIT.'};
+  return{num:3,nombre:'Fase 3 — Consolidación y Rendimiento',color:'#34c97e',objetivo:'Consolidar hábitos, aumentar cargas, preparar el cuerpo para actividad física sostenida.'};
+}
+
+// ════════════════════════════════════════
+// BIBLIOTECA COMPLETA DE EJERCICIOS
+// ════════════════════════════════════════
+var EJ={
+  // CARDIO
+  bicicleta:{n:'Bicicleta',cat:'Cardio',cc:'bor',s:'40–50 min continuo',dur:45,
+    p:['Ajusta el sillín a la altura de tu cadera — la pierna queda casi extendida abajo','Pedalea a un ritmo cómodo donde puedas hablar con frases cortas','Mantén la espalda recta y los hombros relajados, no te encorves','Respira de forma constante — inhala por nariz, exhala por boca','Si hay pendiente, baja la marcha antes de perder el ritmo'],
+    tip:'Mañana en ayunas es ideal — quemas 15% más grasa. Lleva agua.'},
+  caminata:{n:'Caminata rápida',cat:'Cardio',cc:'bor',s:'35–45 min',dur:40,
+    p:['Camina a paso firme — más rápido que pasear, más lento que trotar','Contrae el abdomen suavemente durante toda la caminata','Balancea los brazos doblados a 90° de forma natural','Mantén la vista al frente, barbilla paralela al suelo','Puedes agregar pendiente o escaleras para intensificar'],
+    tip:'30 min de caminata rápida equivalen a 300-350 kcal quemadas.'},
+  trote:{n:'Trote suave',cat:'Cardio',cc:'bor',s:'20–30 min en superficie blanda',dur:25,
+    p:['Calienta 5 min caminando rápido antes de trotar','Trota a un ritmo donde puedas decir frases de 5–6 palabras','Aterriza con el talón-planta, no solo la punta del pie','Mantén el tronco erecto y los hombros sin tensión','Si aparece dolor lumbar irradiado, detente y camina'],
+    tip:'Superficie blanda (pasto, tierra) reduce el impacto en los discos un 30%.'},
+  hiit_bici:{n:'HIIT Bicicleta',cat:'HIIT',cc:'bdr',s:'8 ciclos: 1 min intenso + 2 min suave = 27 min',dur:32,
+    p:['Calienta 5 min a ritmo muy suave','Minuto intenso: pedalea tan fuerte como puedas (80–90% esfuerzo)','Minuto suave x2: pedalea despacio para recuperarte — respira','Repite esos 3 minutos exactamente 8 veces','Enfría 5 min más a ritmo suave al terminar'],
+    tip:'El HIIT es la herramienta más efectiva para reducir grasa visceral. 2x por semana es suficiente y seguro.'},
+
+  // CORE — COLUMNA
+  respira_diafrag:{n:'Respiración Diafragmática',cat:'Core',cc:'bbl',s:'3 series × 10 respiraciones lentas',dur:5,
+    p:['Acuéstate boca arriba, rodillas dobladas, pies apoyados en el suelo','Coloca una mano en el pecho y otra en el abdomen','Inhala lento por la nariz 4 segundos — el abdomen sube, el pecho quieto','Exhala por la boca 6 segundos — el abdomen baja y se aplana','Al exhalar contrae el abdomen profundo como si te preparas para un golpe suave'],
+    tip:'Este ejercicio activa el transverso abdominal — el músculo más importante para proteger la columna.'},
+  puente:{n:'Puente de Glúteos',cat:'Core',cc:'bbl',s:'3 series × 15 repeticiones',dur:6,
+    p:['Acuéstate boca arriba, rodillas dobladas a 90°, pies apoyados en el suelo','Apoya los brazos a los lados con palmas hacia abajo','Aprieta los glúteos y eleva las caderas hasta formar una línea recta muslo-tronco','Sostén 2 segundos arriba apretando bien — sin arquear la espalda','Baja lentamente sin tocar el suelo del todo, y repite'],
+    tip:'Sem 1–4: pies al ancho de caderas. Sem 5–8: agrega un segundo en pausa. Sem 9–12: una sola pierna.'},
+  bird_dog:{n:'Bird Dog',cat:'Core',cc:'bbl',s:'3 series × 10 repeticiones por lado',dur:7,
+    p:['Ponte en cuatro puntos: manos bajo hombros, rodillas bajo caderas','Contrae el abdomen como si fuera a golpearte — zona lumbar neutra','Extiende el brazo derecho y la pierna izquierda simultáneamente','Sostén 3 segundos manteniendo la espalda completamente plana — no gires la cadera','Regresa lento y repite del otro lado (brazo izquierdo + pierna derecha)'],
+    tip:'Si la cadera se tuerce, reduce el rango. La calidad importa más que las repeticiones.'},
+  dead_bug:{n:'Dead Bug (Bicho Muerto)',cat:'Core',cc:'bbl',s:'3 series × 8 repeticiones por lado',dur:7,
+    p:['Acuéstate boca arriba, brazos extendidos hacia el techo, piernas a 90° en el aire','Pega TODA la zona lumbar al suelo — esto es clave durante todo el ejercicio','Exhala y baja el brazo derecho + la pierna izquierda hacia el suelo muy lento','Para justo antes de tocar sin perder el contacto lumbar con el piso','Regresa y alterna lados. Si la espalda se despega, reduce el rango'],
+    tip:'El Dead Bug activa el core profundo sin comprimir los discos lumbares — ideal para tu caso.'},
+  plancha:{n:'Plancha Frontal',cat:'Core',cc:'bbl',s:'3 series × tiempo progresivo',dur:5,
+    p:['Apoya antebrazos en el suelo, codos bajo los hombros, puntas de los pies','El cuerpo forma una línea recta de la cabeza a los talones — como una tabla','Activa el abdomen (jalándolo hacia arriba) y aprieta los glúteos','No dejes caer las caderas ni subas el trasero — pide que alguien lo verifique','Respira normal. Sem 1: 20 seg. Sem 3: 30 seg. Sem 6: 45 seg. Sem 9+: 60 seg'],
+    tip:'Si tiemblas, estás trabajando. Si te duele la espalda baja, baja las rodillas primero.'},
+  plancha_lat:{n:'Plancha Lateral',cat:'Core',cc:'bbl',s:'3 series × 20 segundos por lado',dur:5,
+    p:['Apoya el antebrazo derecho en el suelo, codo bajo el hombro','Levanta las caderas formando una línea recta de cabeza a pies','Cuerpo alineado — no dejes caer la cadera ni la adelantes','El brazo libre puede ir al costado o extendido hacia arriba','Alterna lados. Progrésala poniendo el pie encima del otro'],
+    tip:'Trabaja los oblicuos y el cuadrado lumbar — músculos que estabilizan la columna lateralmente.'},
+  hollow_body:{n:'Hollow Body',cat:'Core',cc:'bbl',s:'3 series × 25 segundos',dur:5,
+    p:['Acuéstate boca arriba, extiende los brazos sobre la cabeza','Pega la zona lumbar completamente al suelo — sin espacio entre lumbar y piso','Eleva los hombros y las piernas unos 15 cm del suelo simultáneamente','Mantén el abdomen muy apretado — el cuerpo forma una curva como media luna','Si es muy difícil, dobla las rodillas a 90° manteniendo pies elevados'],
+    tip:'Uno de los ejercicios de core más completos. Es el mismo patrón que usa un gimnasta.'},
+  psoas_stretch:{n:'Estiramiento de Psoas',cat:'Movilidad',cc:'bgr',s:'3 × 30 segundos por lado',dur:5,
+    p:['Ponte en posición de caballero: rodilla derecha en el suelo, pie izquierdo adelante','El pie izquierdo forma un ángulo recto con la rodilla izquierda','Lleva la cadera suavemente hacia adelante y abajo sin inclinar el tronco','Debes sentir el estiramiento profundo en la parte frontal de la cadera derecha','Mantén 30 seg respirando profundo. Cambia de pierna'],
+    tip:'El psoas acortado es una de las principales causas del dolor lumbar. Estíralo diariamente.'},
+  isquio_stretch:{n:'Estiramiento de Isquiotibiales',cat:'Movilidad',cc:'bgr',s:'2 × 30 segundos por lado',dur:4,
+    p:['Acuéstate boca arriba, pierna derecha extendida en el suelo','Lleva la pierna izquierda hacia arriba sujetando el muslo o la pantorrilla','Mantén la pierna lo más recta posible sin que duela — solo estiramiento','Si no llegas, usa una toalla o liga alrededor del pie','Sostén 30 seg y cambia de pierna'],
+    tip:'Los isquios tensos aumentan la carga sobre los discos lumbares. Estíralos siempre al final.'},
+  gluteo_stretch:{n:'Estiramiento de Piriforme',cat:'Movilidad',cc:'bgr',s:'2 × 30 segundos por lado',dur:4,
+    p:['Acuéstate boca arriba, rodillas dobladas','Cruza el tobillo derecho sobre la rodilla izquierda formando el número 4','Abraza la pierna izquierda y jálala hacia el pecho','Sentirás el estiramiento profundo en el glúteo derecho y cadera','Sostén 30 seg. Este es el músculo que comprime el nervio ciático'],
+    tip:'Si sientes dolor en la cadera interna, este es el ejercicio más importante de tu plan.'},
+
+  // HOMBRO
+  pendulos:{n:'Péndulos de Codman',cat:'Hombro',cc:'bbl',s:'2 minutos de círculos suaves',dur:3,
+    p:['Párate junto a una mesa o silla y apoya la mano sana','Inclínate hacia adelante y deja colgar el brazo derecho totalmente relajado','Mueve el cuerpo ligeramente para que el brazo haga pequeños círculos','Primero en un sentido 1 min, luego en el otro 1 min','Solo el peso del brazo. Sin esfuerzo. Sin dolor. Es relajación articular'],
+    tip:'Fundamental para nutrir el cartílago articular del hombro. Hazlo todos los días sin falta.'},
+  retraccion_esc:{n:'Retracción Escapular',cat:'Hombro',cc:'bbl',s:'3 series × 15 repeticiones',dur:4,
+    p:['Siéntate o párate con la espalda completamente recta','Junta los omóplatos hacia atrás como si quisieras aplastar un lápiz entre ellos','Sostén 3 segundos apretando bien — siente el trabajo entre los omóplatos','Suelta lentamente regresando a la posición inicial','No encojas los hombros hacia arriba — el movimiento es horizontal hacia atrás'],
+    tip:'Corrige la postura escapular que agrava el pinzamiento subacromial. Esencial para tu caso.'},
+  rot_ext_banda:{n:'Rotación Externa con Liga',cat:'Hombro',cc:'bbl',s:'3 series × 15 repeticiones',dur:5,
+    p:['Sujeta la liga con la mano derecha — la otra punta fija a una puerta o poste','Codo doblado a 90° pegado al cuerpo — entre el cuerpo y el codo pon una toalla doblada','Lleva el antebrazo hacia afuera rotando el hombro — la toalla no debe caerse','Regresa lento controlando la resistencia de la liga en todo momento','El movimiento es solo del antebrazo hacia afuera. El codo no se mueve'],
+    tip:'Fortalece el infraespinoso y el redondo menor — músculos que compensan la ruptura del supraespinoso.'},
+  rot_int_banda:{n:'Rotación Interna con Liga',cat:'Hombro',cc:'bbl',s:'3 series × 15 repeticiones',dur:5,
+    p:['Liga fija del mismo lado, mano derecha sujeta la liga','Codo doblado a 90° pegado al cuerpo con toalla','Lleva el antebrazo hacia adentro (hacia el abdomen) rotando el hombro','Regresa lento controlando la tensión de la liga','Solo el antebrazo se mueve — el codo permanece fijo junto al cuerpo'],
+    tip:'Equilibra la fuerza del manguito rotador. Siempre en par con la rotación externa.'},
+  rot_iso:{n:'Rotación Isométrica Pared',cat:'Hombro',cc:'bbl',s:'3 series × 10 rep × 5 segundos',dur:4,
+    p:['Párate al lado de una pared con el codo derecho a 90°','Coloca el dorso de la mano derecha contra la pared','Empuja la mano contra la pared intentando llevarla hacia afuera — la mano NO se mueve','Mantén 5 segundos apretando con fuerza moderada','Suelta, respira y repite. No fuerces si hay dolor'],
+    tip:'Ejercicio isométrico — el más seguro para activar el manguito rotador sin cargar la ruptura.'},
+  face_pull:{n:'Face Pull con Liga',cat:'Hombro',cc:'bbl',s:'3 series × 15 repeticiones',dur:5,
+    p:['Fija la liga a la altura de los ojos en una puerta o poste','Sujeta con ambas manos — pulgares apuntando hacia atrás','Jala la liga hacia tu cara con los codos en alto (nivel de los ojos)','Al llegar, las manos quedan a los lados de la cara — aprieta los omóplatos','Regresa lento sin dejar que la liga te jale de golpe'],
+    tip:'Fortalece el deltoides posterior y el manguito rotador. Contrarresta el pinzamiento subacromial.'},
+  elev_lateral:{n:'Elevación Lateral',cat:'Hombro',cc:'bbl',s:'3 series × 12 rep · 2–3 kg',dur:5,
+    p:['De pie con una mancuerna liviana en cada mano (2–3 kg máximo)','Codos ligeramente doblados — nunca bloquees el codo en extensión total','Sube los brazos hacia los lados hasta 90° — NO más arriba por ahora','Pausa 1 segundo en la posición más alta','Baja muy lento (3 segundos bajando) — ahí es donde más se trabaja'],
+    tip:'Sem 5–8: máximo 90°. Sem 9–12: puedes llegar a 100–110° si no hay dolor.'},
+  elev_frontal:{n:'Elevación Frontal',cat:'Hombro',cc:'bbl',s:'3 series × 12 rep · 2 kg',dur:5,
+    p:['De pie con una mancuerna en la mano derecha (2 kg máximo)','Brazo extendido frente al cuerpo, palma hacia abajo','Sube el brazo al frente hasta 90° — al nivel del hombro, no más','Pausa 1 segundo arriba','Baja lento controlando el movimiento. Alterna brazos o ambos a la vez'],
+    tip:'Activa el supraespinoso de forma controlada. Clave para recuperar la función del tendón reparado.'},
+
+  // FUERZA TREN INFERIOR
+  sent_goblet:{n:'Sentadilla Goblet',cat:'Fuerza',cc:'bpu',s:'3 series × 12 repeticiones',dur:7,
+    p:['Sostén una mancuerna vertical frente al pecho con ambas manos — como un cáliz','Pies separados al ancho de los hombros, puntas ligeramente hacia afuera (11 y 1 del reloj)','Baja como si te fueras a sentar en una silla que está detrás — el peso va a los talones','Las rodillas siguen la dirección de los pies — no se juntan hacia adentro','Baja hasta que los muslos queden paralelos al suelo (o cerca). Sube empujando con los talones'],
+    tip:'Sem 5–6: 12kg. Sem 7–8: 14–16kg. Sem 9–12: 18–20kg. Si duele la espalda, reduce el rango.'},
+  split_squat:{n:'Estocada (Split Squat)',cat:'Fuerza',cc:'bpu',s:'3 series × 10 rep por lado',dur:8,
+    p:['De pie, da un paso grande hacia adelante con el pie derecho','Baja la rodilla trasera (izquierda) hacia el suelo lentamente','La rodilla delantera no pasa la punta del pie — tronco erecto','Baja hasta que la rodilla trasera casi toque el suelo','Empuja con el talón delantero para subir. Alterna piernas'],
+    tip:'Trabaja glúteos, cuádriceps e isquiotibiales de forma unilateral — corrige desbalances.'},
+  peso_muerto_r:{n:'Peso Muerto Rumano',cat:'Fuerza',cc:'bpu',s:'3 series × 10 repeticiones',dur:7,
+    p:['De pie con mancuernas frente a los muslos — pies al ancho de caderas','Rodillas ligeramente flexionadas — mantén esta flexión durante todo el ejercicio','Bisagra en la cadera: inclínate hacia adelante bajando las mancuernas por las piernas','Mantén la espalda RECTA en todo momento — no redondees la lumbar nunca','Siente el estiramiento en la parte trasera de los muslos, luego sube apretando glúteos'],
+    tip:'Es el ejercicio más efectivo para activar los músculos paraespinales. Empieza con 8–10 kg.'},
+
+  // FUERZA TREN SUPERIOR
+  press_pecho:{n:'Press de Pecho con Mancuernas',cat:'Fuerza',cc:'bpu',s:'3 series × 12 repeticiones',dur:6,
+    p:['Acuéstate en el suelo o en un banco con una mancuerna en cada mano','Codos doblados a 90°, mancuernas al nivel del pecho','Empuja las mancuernas hacia arriba extendiendo los brazos — sin bloquear el codo','En la cima, los mancuernas no se tocan — mantén 1 cm de separación','Baja lento 3 segundos hasta que los codos toquen el suelo o queden al nivel del pecho'],
+    tip:'Si haces en el suelo, el rango limitado protege el hombro. Ideal para tu fase de recuperación.'},
+  remo_mancuerna:{n:'Remo con Mancuerna',cat:'Fuerza',cc:'bpu',s:'3 series × 12 rep por lado',dur:7,
+    p:['Apoya la mano y rodilla izquierdas en una silla — espalda paralela al suelo','Mancuerna en la mano derecha colgando hacia el suelo con el brazo extendido','Jala la mancuerna hacia tu cadera — el codo va pegado al cuerpo hacia atrás','En la posición alta, aprieta el omóplato derecho durante 1 segundo','Baja lento y controla. Completa todas las reps de un lado antes de cambiar'],
+    tip:'Activa los paraespinales, el dorsal y los romboides. Uno de los mejores ejercicios para tu columna.'},
+  curl_bicep:{n:'Curl de Bíceps',cat:'Fuerza',cc:'bpu',s:'3 series × 12 repeticiones',dur:5,
+    p:['De pie con una mancuerna en cada mano, palmas hacia arriba','Codos pegados a los costados del cuerpo — no se mueven durante el ejercicio','Dobla los codos llevando las mancuernas hacia los hombros','En la cima, aprieta el bíceps 1 segundo','Baja lento (3 segundos) extendiendo completamente el brazo'],
+    tip:'Sem 5–6: 8 kg. Sem 7–8: 10 kg. Sem 9–12: 12 kg. La bajada lenta es donde más crecen.'},
+  tric_liga:{n:'Extensión de Tríceps con Liga',cat:'Fuerza',cc:'bpu',s:'3 series × 15 repeticiones',dur:5,
+    p:['Fija la liga en alto (en una puerta). De pie con la espalda a la puerta','Sujeta la liga con ambas manos sobre la cabeza','Codos apuntando hacia arriba — estos no se mueven','Extiende los codos bajando las manos hacia abajo','Regresa lento. El movimiento es solo de los antebrazos'],
+    tip:'Fortalece el tríceps sin cargar el hombro en posición vulnerable. Seguro para tu caso.'},
+  press_hombro:{n:'Press de Hombro con Mancuernas',cat:'Fuerza',cc:'bpu',s:'3 series × 10 repeticiones · 4–6 kg',dur:6,
+    p:['Siéntate con espalda completamente recta — apoyada en una silla firme','Mancuernas a la altura de los hombros, palmas hacia adelante','Empuja hacia arriba extendiendo los brazos — para antes de bloquear el codo','Baja lento hasta la posición inicial — codos a 90°','Solo desde sem 9 en adelante si el hombro no presenta dolor'],
+    tip:'Introduce este ejercicio solo en Fase 3. Siempre con peso liviano y supervisión inicial.'},
+
+  // FUERZA FUNCIONAL
+  remo_liga:{n:'Remo con Liga',cat:'Fuerza',cc:'bpu',s:'3 series × 15 repeticiones',dur:5,
+    p:['Siéntate en el suelo con las piernas extendidas, liga alrededor de los pies','Sujeta la liga con ambas manos, espalda recta','Jala la liga hacia el abdomen manteniendo los codos pegados al cuerpo','Aprieta los omóplatos en la posición final 1 segundo','Regresa lento. Si la liga es muy suave, crúzala para aumentar resistencia'],
+    tip:'Excelente para principiantes. Activa todos los músculos de la espalda media sin carga axial.'},
+  sentadilla_libre:{n:'Sentadilla Libre (Peso Corporal)',cat:'Fuerza',cc:'bpu',s:'3 series × 15 repeticiones',dur:5,
+    p:['Pies al ancho de hombros, puntas ligeramente afuera','Brazos al frente o cruzados en el pecho para equilibrio','Baja como si te sentaras en una silla imaginaria — espalda recta','Rodillas siguen la dirección de los pies, sin juntarse','Sube empujando con los talones apretando glúteos al final'],
+    tip:'El ejercicio más funcional. Perfecto para las semanas 1–4 antes de agregar carga.'},
+  puente_glut_una_pierna:{n:'Puente de Glúteos a Una Pierna',cat:'Fuerza',cc:'bpu',s:'3 series × 10 rep por lado',dur:6,
+    p:['Posición de puente normal: boca arriba, rodillas dobladas','Extiende la pierna derecha hacia arriba — solo la izquierda apoya','Eleva las caderas con la pierna izquierda manteniendo el cuerpo nivelado','La cadera no debe caer de ningún lado — mantén el nivel','Baja lento. Completa todas las reps de un lado antes de cambiar'],
+    tip:'Progresión del puente de glúteos. Introduce desde la semana 5.'}
+};
+
+// ════════════════════════════════════════
+// PLAN DE 12 SEMANAS COMPLETO
+// DOW: 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb, 0=Dom(descanso)
+// Cada día tiene 6–8 ejercicios = 30–40 min
+// ════════════════════════════════════════
+var PLAN={
+  // FASE 1 — Semanas 1–4 — Activación
+  // Lun/Mié/Vie: Cardio + Core columna + Hombro
+  // Mar/Jue: Core intenso + Hombro + Movilidad
+  // Sáb: Cardio largo + Estiramientos completos
+  1:{
+    1:['bicicleta','respira_diafrag','puente','bird_dog','pendulos','retraccion_esc','rot_iso','psoas_stretch'],
+    2:['caminata','dead_bug','plancha','bird_dog','rot_ext_banda','rot_int_banda','psoas_stretch','isquio_stretch'],
+    3:['bicicleta','respira_diafrag','puente','plancha_lat','pendulos','retraccion_esc','rot_iso','gluteo_stretch'],
+    4:['caminata','dead_bug','bird_dog','plancha','rot_ext_banda','rot_int_banda','isquio_stretch','gluteo_stretch'],
+    5:['bicicleta','respira_diafrag','puente','dead_bug','pendulos','rot_ext_banda','psoas_stretch','isquio_stretch'],
+    6:['caminata','plancha','plancha_lat','bird_dog','retraccion_esc','rot_iso','psoas_stretch','gluteo_stretch'],
+    0:[]
+  },
+  2:{
+    1:['bicicleta','respira_diafrag','puente','bird_dog','plancha','pendulos','rot_ext_banda','psoas_stretch'],
+    2:['caminata','dead_bug','plancha_lat','bird_dog','rot_int_banda','retraccion_esc','isquio_stretch','gluteo_stretch'],
+    3:['trote','respira_diafrag','puente','plancha','pendulos','rot_ext_banda','rot_iso','psoas_stretch'],
+    4:['caminata','dead_bug','bird_dog','plancha_lat','rot_int_banda','retraccion_esc','gluteo_stretch','isquio_stretch'],
+    5:['bicicleta','puente','plancha','dead_bug','pendulos','rot_ext_banda','psoas_stretch','isquio_stretch'],
+    6:['caminata','bird_dog','plancha_lat','retraccion_esc','rot_iso','gluteo_stretch','psoas_stretch','isquio_stretch'],
+    0:[]
+  },
+  3:{
+    1:['bicicleta','respira_diafrag','puente','bird_dog','plancha','pendulos','rot_ext_banda','elev_frontal'],
+    2:['trote','dead_bug','plancha_lat','bird_dog','rot_int_banda','retraccion_esc','face_pull','psoas_stretch'],
+    3:['bicicleta','puente','plancha','dead_bug','pendulos','elev_frontal','rot_iso','isquio_stretch'],
+    4:['caminata','bird_dog','plancha_lat','respira_diafrag','rot_ext_banda','rot_int_banda','face_pull','gluteo_stretch'],
+    5:['bicicleta','puente','plancha','dead_bug','pendulos','elev_frontal','psoas_stretch','isquio_stretch'],
+    6:['caminata','bird_dog','plancha_lat','retraccion_esc','rot_ext_banda','face_pull','psoas_stretch','gluteo_stretch'],
+    0:[]
+  },
+  4:{
+    1:['bicicleta','respira_diafrag','puente','bird_dog','plancha','pendulos','elev_frontal','rot_ext_banda'],
+    2:['trote','dead_bug','hollow_body','plancha_lat','rot_int_banda','face_pull','psoas_stretch','isquio_stretch'],
+    3:['bicicleta','puente','plancha','bird_dog','pendulos','elev_frontal','rot_iso','gluteo_stretch'],
+    4:['caminata','dead_bug','hollow_body','bird_dog','rot_ext_banda','face_pull','isquio_stretch','gluteo_stretch'],
+    5:['bicicleta','puente','plancha','hollow_body','pendulos','elev_lateral','psoas_stretch','isquio_stretch'],
+    6:['caminata','bird_dog','plancha_lat','retraccion_esc','rot_ext_banda','face_pull','psoas_stretch','gluteo_stretch'],
+    0:[]
+  },
+  // FASE 2 — Semanas 5–8 — Fortalecimiento
+  // Lun/Mié/Vie: HIIT + Fuerza superior + Core
+  // Mar/Jue: Cardio + Fuerza inferior + Hombro
+  // Sáb: Cardio moderado + Fuerza completa
+  5:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','plancha','pendulos','rot_ext_banda','psoas_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','puente','face_pull','elev_lateral','isquio_stretch','gluteo_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','hollow_body','pendulos','rot_int_banda','psoas_stretch'],
+    4:['bicicleta','sent_goblet','peso_muerto_r','split_squat','face_pull','elev_lateral','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','plancha','rot_ext_banda','psoas_stretch','isquio_stretch'],
+    6:['bicicleta','sent_goblet','peso_muerto_r','puente_glut_una_pierna','face_pull','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  },
+  6:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','hollow_body','pendulos','rot_ext_banda','psoas_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','split_squat','face_pull','elev_lateral','isquio_stretch','gluteo_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','plancha','rot_int_banda','pendulos','psoas_stretch'],
+    4:['bicicleta','sent_goblet','peso_muerto_r','puente_glut_una_pierna','face_pull','elev_frontal','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','hollow_body','rot_ext_banda','psoas_stretch','isquio_stretch'],
+    6:['bicicleta','sent_goblet','split_squat','peso_muerto_r','face_pull','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  },
+  7:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','plancha','face_pull','elev_lateral','psoas_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','split_squat','remo_liga','rot_ext_banda','isquio_stretch','gluteo_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','hollow_body','face_pull','pendulos','psoas_stretch'],
+    4:['bicicleta','sent_goblet','peso_muerto_r','puente_glut_una_pierna','remo_liga','elev_lateral','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','plancha_lat','face_pull','psoas_stretch','isquio_stretch'],
+    6:['bicicleta','sent_goblet','split_squat','peso_muerto_r','remo_liga','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  },
+  8:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','hollow_body','face_pull','rot_ext_banda','psoas_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','split_squat','remo_liga','elev_lateral','isquio_stretch','gluteo_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','plancha','face_pull','pendulos','psoas_stretch'],
+    4:['bicicleta','sent_goblet','peso_muerto_r','puente_glut_una_pierna','remo_liga','elev_frontal','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','hollow_body','face_pull','psoas_stretch','isquio_stretch'],
+    6:['trote','sent_goblet','split_squat','peso_muerto_r','remo_liga','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  },
+  // FASE 3 — Semanas 9–12 — Consolidación
+  // Mayor carga, mayor intensidad, press de hombro incluido desde sem 9
+  9:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','plancha','psoas_stretch','isquio_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','split_squat','face_pull','elev_lateral','gluteo_stretch','isquio_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','press_hombro','hollow_body','pendulos','psoas_stretch'],
+    4:['trote','sent_goblet','peso_muerto_r','puente_glut_una_pierna','remo_liga','elev_lateral','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','plancha','psoas_stretch','isquio_stretch'],
+    6:['bicicleta','sent_goblet','split_squat','peso_muerto_r','face_pull','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  },
+  10:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','hollow_body','psoas_stretch','isquio_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','split_squat','remo_liga','elev_lateral','gluteo_stretch','isquio_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','press_hombro','plancha','face_pull','psoas_stretch'],
+    4:['trote','sent_goblet','peso_muerto_r','puente_glut_una_pierna','remo_liga','elev_frontal','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','hollow_body','psoas_stretch','isquio_stretch'],
+    6:['bicicleta','sent_goblet','split_squat','peso_muerto_r','face_pull','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  },
+  11:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','plancha','psoas_stretch','isquio_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','split_squat','remo_liga','face_pull','gluteo_stretch','isquio_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','press_hombro','hollow_body','elev_lateral','psoas_stretch'],
+    4:['trote','sent_goblet','peso_muerto_r','puente_glut_una_pierna','remo_liga','elev_frontal','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','plancha_lat','face_pull','psoas_stretch'],
+    6:['trote','sent_goblet','split_squat','peso_muerto_r','remo_liga','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  },
+  12:{
+    1:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','hollow_body','psoas_stretch','isquio_stretch'],
+    2:['trote','sent_goblet','peso_muerto_r','split_squat','remo_liga','face_pull','gluteo_stretch','isquio_stretch'],
+    3:['hiit_bici','press_pecho','remo_mancuerna','tric_liga','press_hombro','plancha','elev_lateral','psoas_stretch'],
+    4:['trote','sent_goblet','peso_muerto_r','puente_glut_una_pierna','remo_liga','elev_frontal','isquio_stretch','gluteo_stretch'],
+    5:['hiit_bici','press_pecho','remo_mancuerna','curl_bicep','press_hombro','hollow_body','face_pull','psoas_stretch'],
+    6:['trote','sent_goblet','split_squat','peso_muerto_r','remo_liga','elev_lateral','gluteo_stretch','psoas_stretch'],
+    0:[]
+  }
+};
+
+var TIPO_DIA={
+  1:{1:'Cardio + Core + Hombro',2:'Cardio + Core + Movilidad',3:'Cardio + Core + Hombro',4:'Core Intenso + Movilidad',5:'Cardio + Core + Hombro',6:'Cardio + Estiramientos'},
+  2:{1:'HIIT + Fuerza Superior',2:'Cardio + Fuerza Inferior',3:'HIIT + Fuerza Superior',4:'Cardio + Fuerza Inferior',5:'HIIT + Fuerza Superior',6:'Cardio + Fuerza Completa'},
+  3:{1:'HIIT + Fuerza + Hombro',2:'Cardio + Fuerza + Hombro',3:'HIIT + Fuerza + Hombro',4:'Cardio + Fuerza + Hombro',5:'HIIT + Fuerza + Hombro',6:'Cardio + Consolidación'}
+};
+
+function getTipoDia(sem,dow){
+  if(dow===0)return'Descanso activo';
+  var fase=sem<=4?1:(sem<=8?2:3);
+  return TIPO_DIA[fase][dow]||'Entrenamiento';
+}
+
+function getPlanDia(sem,dow){
+  var s=PLAN[sem];
+  if(!s)s=PLAN[12];
+  return s[dow]||[];
+}
+
+function getDateForSemDow(sem,dow){
+  // sem 1 starts Mon 29 Jun 2026
+  var startMon=new Date('2026-06-29T12:00:00');
+  var semOffset=(sem-1)*7;
+  var dowOffset=dow===0?6:dow-1; // Mon=0..Sat=5, Sun=6
+  var d=new Date(startMon);
+  d.setDate(d.getDate()+semOffset+dowOffset);
+  return d.toISOString().slice(0,10);
+}
+
+function getCurrentSemDow(){
+  var sem=getSemActual();
+  var dow=DOW_TODAY;
+  return{sem:sem,dow:dow};
+}
+
+// ════════════════════════════════════════
+// RENDER SECCIÓN EJERCICIO
+// ════════════════════════════════════════
+async function renderEjercicio(){
+  var cur=getCurrentSemDow();
+  S.viewSem=cur.sem;
+  S.viewDow=cur.dow===0?1:cur.dow; // Si es domingo, muestra lunes
+
+  var fi=getFaseInfo(cur.sem);
+  document.getElementById('phase-title').textContent='Semana '+cur.sem+' de 12 — '+fi.nombre;
+  document.getElementById('phase-sub').textContent=fi.objetivo;
+  document.getElementById('phase-banner').style.borderColor=fi.color+'55';
+
+  // Update dashboard phase msg
+  var dmsg=document.getElementById('dash-phase-msg');
+  if(dmsg)dmsg.innerHTML='<strong>Semana '+cur.sem+' — '+fi.nombre+'</strong> · '+fi.objetivo;
+
+  renderWeekTabs();
+  renderDayTabs();
+  await renderDayPlan();
+  await renderComplianceChart();
+}
+
+function renderWeekTabs(){
+  var cur=getSemActual();
+  var html='';
+  for(var i=1;i<=12;i++){
+    var fi=getFaseInfo(i);
+    var isCur=i===cur;
+    var isView=i===S.viewSem;
+    html+='<button class="wtab'+(isView?' active':'')+(isCur?' current':'')+'" onclick="selectSem('+i+')">'+
+      'S'+i+(isCur?' ←':'')+
+    '</button>';
+  }
+  document.getElementById('week-tabs').innerHTML=html;
+}
+
+function renderDayTabs(){
+  var today=new Date().toISOString().slice(0,10);
+  var html='';
+  var dias_label=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  // Show Mon–Sat for selected week, then Sun
+  var order=[1,2,3,4,5,6,0];
+  for(var i=0;i<order.length;i++){
+    var dow=order[i];
+    var fecha=getDateForSemDow(S.viewSem,dow);
+    var isToday=fecha===today;
+    var isView=dow===S.viewDow;
+    var isRest=dow===0;
+    html+='<button class="dtab'+(isView?' active':'')+(isToday?' today':'')+(isRest?' rest-day':'')+'" onclick="selectDow('+dow+')">'+
+      dias_label[dow]+(isToday?' ●':'')+
+    '</button>';
+  }
+  document.getElementById('day-tabs').innerHTML=html;
+}
+
+async function selectSem(sem){
+  S.viewSem=sem;
+  // Keep same DOW or go to Monday
+  renderWeekTabs();
+  renderDayTabs();
+  await renderDayPlan();
+}
+
+async function selectDow(dow){
+  S.viewDow=dow;
+  renderDayTabs();
+  await renderDayPlan();
+}
+
+async function renderDayPlan(){
+  var sem=S.viewSem;
+  var dow=S.viewDow;
+  var fecha=getDateForSemDow(sem,dow);
+  var today=new Date().toISOString().slice(0,10);
+  var isToday=fecha===today;
+  var plan=getPlanDia(sem,dow);
+  var fi=getFaseInfo(sem);
+
+  // Load ej log for this date
+  S.ejLog=await loadEjLog(fecha);
+
+  var content=document.getElementById('day-content');
+  var sumEl=document.getElementById('day-summary');
+
+  if(dow===0){
+    content.innerHTML='<div class="card"><div class="rest-box">'+
+      '<div class="rest-icon">😴</div>'+
+      '<div style="font-family:Space Grotesk,sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Domingo — Día de Descanso</div>'+
+      '<div style="color:var(--mu);font-size:13px;line-height:1.7">El descanso es parte del entrenamiento. Hoy tus músculos se recuperan y crecen.<br><br>'+
+      'Puedes hacer una caminata suave de 20–30 min si quieres mantenerte activo.<br><br>'+
+      '<strong style="color:var(--gr)">Mañana es Lunes — ¡prepárate para arrancar con energía!</strong></div>'+
+      '</div></div>';
+    if(sumEl)sumEl.innerHTML='';
+    return;
+  }
+
+  var total=plan.length;
+  var done=plan.filter(function(k){return S.ejLog[k];}).length;
+  var pct=total>0?Math.round((done/total)*100):0;
+  var barCol=pct>=80?'var(--gr)':pct>=50?'var(--or)':'var(--rd)';
+  var durTotal=plan.reduce(function(a,k){return a+(EJ[k]?EJ[k].dur:0);},0);
+
+  var html='<div class="card">'+
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px">'+
+      '<div>'+
+        '<div style="font-family:Space Grotesk,sans-serif;font-size:16px;font-weight:700">'+DIAS_ES[dow]+' — '+getTipoDia(sem,dow)+'</div>'+
+        '<div style="font-size:11px;color:var(--mu);margin-top:3px">'+fecha+(isToday?' · Hoy':'')+' · ~'+durTotal+' min · '+total+' ejercicios</div>'+
+      '</div>'+
+      '<div style="text-align:right;flex-shrink:0">'+
+        '<div style="font-size:22px;font-weight:700;color:'+barCol+'">'+pct+'%</div>'+
+        '<div style="font-size:10px;color:var(--mu)">'+done+'/'+total+' hechos</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="comp-bar"><div class="comp-fill" id="comp-bar-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
+    '</div>';
+
+  plan.forEach(function(key){
+    var ej=EJ[key];
+    if(!ej)return;
+    var isDone=S.ejLog[key]||false;
+    html+='<div class="ej-card'+(isDone?' done-ej':'')+'" id="ejc-'+key+'">'+
+      '<div class="ej-head" onclick="toggleExpand(\''+key+'\')">'+
+        '<div class="ej-chk">'+(isDone?'✓':'')+'</div>'+
+        '<div style="flex:1">'+
+          '<div class="ej-nm">'+ej.n+'</div>'+
+          '<div class="ej-mt">'+ej.s+'</div>'+
+        '</div>'+
+        '<span class="cbg '+ej.cc+'" style="margin-right:6px">'+ej.cat+'</span>'+
+        '<span class="ej-arr">▾</span>'+
+      '</div>'+
+      '<div class="ej-body">'+
+        '<div style="margin-bottom:12px">'+
+          ej.p.map(function(p,i){return'<div class="step"><div class="stepn">'+(i+1)+'</div><div>'+p+'</div></div>';}).join('')+
+        '</div>'+
+        (ej.tip?'<div class="tip-box">💡 '+ej.tip+'</div>':'')+
+        '<button class="mark-btn '+(isDone?'mcomp':'mpend')+'" onclick="toggleEj(\''+key+'\',\''+fecha+'\')">'+
+          (isDone?'✓ Completado — toca para deshacer':'Marcar como completado')+
+        '</button>'+
+      '</div>'+
+    '</div>';
+  });
+
+  content.innerHTML=html;
+  if(isToday)renderDaySummary(plan,fecha);
+  else if(sumEl)sumEl.innerHTML='';
+}
+
+function renderDaySummary(plan,fecha){
+  var total=plan.length;
+  var done=plan.filter(function(k){return S.ejLog[k];}).length;
+  var pend=total-done;
+  var pct=total>0?Math.round((done/total)*100):0;
+  var col=pct>=80?'var(--gr)':pct>=50?'var(--or)':'var(--rd)';
+  var emoji=pct>=100?'🏆':pct>=80?'💪':pct>=50?'⚡':'🎯';
+  var msg=pct>=100?'¡Día perfecto! Descansa bien esta noche.':pct>=80?'¡Casi completo! Muy buen trabajo hoy.':pct>=50?'Buen avance. Intenta completar los que quedan.':'Empieza cuando puedas. Cada ejercicio cuenta.';
+  var el=document.getElementById('day-summary');
+  if(!el)return;
+  el.innerHTML='<div class="sum-card">'+
+    '<div style="font-family:Space Grotesk,sans-serif;font-size:16px;font-weight:700;margin-bottom:12px">'+emoji+' Resumen del día de hoy</div>'+
+    '<div class="sum-row"><span>Completados</span><span style="font-weight:700;color:'+col+'">'+done+' / '+total+'</span></div>'+
+    '<div class="sum-row"><span>Cumplimiento</span><span style="font-weight:700;color:'+col+'">'+pct+'%</span></div>'+
+    '<div class="sum-row"><span>Pendientes</span><span style="font-weight:700;color:'+(pend>0?'var(--or)':'var(--gr)')+'">'+pend+'</span></div>'+
+    '<div class="comp-bar" style="margin:10px 0"><div class="comp-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+    '<div style="font-size:12px;color:'+col+';text-align:center;margin-top:6px">'+msg+'</div>'+
+    '</div>';
+}
+
+function toggleExpand(key){
+  var c=document.getElementById('ejc-'+key);
+  if(c)c.classList.toggle('open');
+}
+
+async function toggleEj(key,fecha){
+  var cur=S.ejLog[key]||false;
+  var nv=!cur;
+  S.ejLog[key]=nv;
+  // Update card UI
+  var card=document.getElementById('ejc-'+key);
+  if(card){
+    card.classList.toggle('done-ej',nv);
+    var chk=card.querySelector('.ej-chk');
+    if(chk)chk.textContent=nv?'✓':'';
+    var btn=card.querySelector('.mark-btn');
+    if(btn){btn.textContent=nv?'✓ Completado — toca para deshacer':'Marcar como completado';btn.className='mark-btn '+(nv?'mcomp':'mpend');}
+  }
+  // Update progress bar
+  var sem=S.viewSem;
+  var dow=S.viewDow;
+  var plan=getPlanDia(sem,dow);
+  var total=plan.length;
+  var done=plan.filter(function(k){return S.ejLog[k];}).length;
+  var pct=total>0?Math.round((done/total)*100):0;
+  var col=pct>=80?'var(--gr)':pct>=50?'var(--or)':'var(--rd)';
+  var fill=document.getElementById('comp-bar-fill');
+  if(fill){fill.style.width=pct+'%';fill.style.background=col;}
+  var pctEl=card?card.closest('.ct').querySelector&&null:null;
+
+  var ejInfo=EJ[key]||{};
+  await db.from('ejercicios_log').upsert({
+    fecha:fecha,ejercicio_key:key,
+    ejercicio_nombre:ejInfo.n||key,categoria:ejInfo.cat||'',
+    completado:nv,semana_num:getSemActual(),
+    dia_semana:DIAS_ES[new Date(fecha+'T12:00:00').getDay()]
+  },{onConflict:'fecha,ejercicio_key'});
+
+  renderDaySummary(plan,fecha);
+  updateKPIs();
+  toast(nv?'✅ '+ejInfo.n+' completado':'↩ Desmarcado');
+}
+
+async function loadEjLog(fecha){
+  var res=await db.from('ejercicios_log').select('ejercicio_key,completado').eq('fecha',fecha);
+  var log={};
+  if(res.data)res.data.forEach(function(r){log[r.ejercicio_key]=r.completado;});
+  return log;
+}
+
+async function renderComplianceChart(){
+  var el=document.getElementById('compliance-chart');
+  var desde=new Date(TODAY+'T12:00:00');
+  desde.setDate(desde.getDate()-27);
+  var desdeStr=desde.toISOString().slice(0,10);
+  var res=await db.from('ejercicios_log').select('fecha,completado').gte('fecha',desdeStr).order('fecha');
+  if(!res.data||!res.data.length){el.innerHTML='<p class="em">Completa ejercicios para ver tu progreso.</p>';return;}
+  var weeks={};
+  res.data.forEach(function(r){
+    var d=new Date(r.fecha+'T12:00:00');
+    var ws=new Date(d);ws.setDate(d.getDate()-((d.getDay()+6)%7));// Monday as week start
+    var wk=ws.toISOString().slice(0,10);
+    if(!weeks[wk])weeks[wk]={total:0,done:0};
+    weeks[wk].total++;
+    if(r.completado)weeks[wk].done++;
+  });
+  var wkKeys=Object.keys(weeks).sort().slice(-4);
+  var html='';
+  wkKeys.forEach(function(wk,i){
+    var w=weeks[wk];
+    var pct=w.total>0?Math.round((w.done/w.total)*100):0;
+    var col=pct>=80?'var(--gr)':pct>=50?'var(--or)':'var(--rd)';
+    var lbl=i===wkKeys.length-1?'Esta semana':'Hace '+(wkKeys.length-1-i)+' sem';
+    html+='<div class="wrow">'+
+      '<div class="wnm">'+lbl+'</div>'+
+      '<div class="wbr">'+
+        '<div class="comp-bar"><div class="comp-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+        '<div style="font-size:10px;color:var(--mu);margin-top:3px">'+w.done+'/'+w.total+' ejercicios completados</div>'+
+      '</div>'+
+      '<div class="wpct" style="color:'+col+'">'+pct+'%</div>'+
+    '</div>';
+  });
+  el.innerHTML=html||'<p class="em">Completa ejercicios para ver el progreso.</p>';
+}
+
+// ════════════════════════════════════════
+// RESTO DEL APP
+// ════════════════════════════════════════
+function showSec(id,el){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.ntb').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('sec-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  if(id==='medidas')renderMedTable();
+  if(id==='historial')loadHist();
+  if(id==='nutricion')renderComidaHoy();
+  if(id==='ejercicio')renderEjercicio();
+}
+
+async function init(){
+  loading(true);
+  try{
+    await Promise.all([loadMedidas(),loadSupps(),loadComida(),loadChecks()]);
+    // Load today's ej log for KPIs
+    S.ejLog=await loadEjLog(TODAY);
+    updateKPIs();
+    // Update dashboard phase
+    var cur=getCurrentSemDow();
+    var fi=getFaseInfo(cur.sem);
+    var dmsg=document.getElementById('dash-phase-msg');
+    if(dmsg)dmsg.innerHTML='<strong>Semana '+cur.sem+' — '+fi.nombre+'</strong> · '+fi.objetivo;
+  }catch(e){toast('Error de conexión','var(--rd)');console.error(e);}
+  loading(false);
+}
+
+async function loadChecks(){
+  var res=await db.from('logs_diarios').select('checks_completados').eq('fecha',TODAY).order('created_at',{ascending:false}).limit(1);
+  if(res.data&&res.data[0]&&res.data[0].checks_completados)res.data[0].checks_completados.forEach(function(k){S.checks[k]=true;});
+  document.querySelectorAll('#daily-checklist .ci').forEach(function(el){if(S.checks[el.dataset.key])el.classList.add('done');});
+}
+function toggleCheck(el){el.classList.toggle('done');S.checks[el.dataset.key]=el.classList.contains('done');updateKPIs();}
+function setPain(z,v){S.dolor[z]=v;document.querySelectorAll('#pain-'+z+' .pbb').forEach(function(b,i){b.classList.toggle('sp2',i===v);});}
+async function saveDailyLog(){
+  var nota=document.getElementById('nota-dia').value.trim();
+  var checks=Object.entries(S.checks).filter(function(e){return e[1];}).map(function(e){return e[0];});
+  loading(true);
+  var res=await db.from('logs_diarios').insert({fecha:TODAY,dolor_lumbar:S.dolor.lumbar,dolor_hombro:S.dolor.hombro,nota:nota,checks_completados:checks});
+  loading(false);
+  if(res.error){toast('Error: '+res.error.message,'var(--rd)');return;}
+  document.getElementById('nota-dia').value='';toast('Registro guardado');
+}
+async function loadComida(){
+  var res=await db.from('comidas').select('*').eq('fecha',TODAY);
+  if(!res.data)return;
+  S.macros=res.data.reduce(function(a,c){return{cal:a.cal+(c.calorias||0),prot:a.prot+(c.proteina||0),carb:a.carb+(c.carbohidratos||0),fat:a.fat+(c.grasas||0),agua:a.agua+(c.agua||0)};},{cal:0,prot:0,carb:0,fat:0,agua:0});
+  updateNutBars();
+}
+async function saveComida(){
+  var tipo=document.getElementById('c-tipo').value;
+  var p={fecha:TODAY,tipo_comida:tipo,proteina:parseFloat(document.getElementById('c-prot').value)||0,calorias:parseFloat(document.getElementById('c-cal').value)||0,carbohidratos:parseFloat(document.getElementById('c-carb').value)||0,grasas:parseFloat(document.getElementById('c-fat').value)||0,agua:parseFloat(document.getElementById('c-agua').value)||0,descripcion:document.getElementById('c-desc').value.trim()};
+  loading(true);var res=await db.from('comidas').insert(p);loading(false);
+  if(res.error){toast('Error: '+res.error.message,'var(--rd)');return;}
+  S.macros.cal+=p.calorias;S.macros.prot+=p.proteina;S.macros.carb+=p.carbohidratos;S.macros.fat+=p.grasas;S.macros.agua+=p.agua;
+  updateNutBars();updateKPIs();markMeal(tipo);renderComidaHoy();
+  ['c-prot','c-cal','c-carb','c-fat','c-agua','c-desc'].forEach(function(id){document.getElementById(id).value='';});
+  toast('Comida registrada');
+}
+function updateNutBars(){
+  var m=S.macros,T={cal:2300,prot:150,carb:240,fat:70,agua:3};
+  function p(v,t){return Math.min(100,(v/t)*100).toFixed(0)+'%';}
+  document.getElementById('cal-val').textContent=Math.round(m.cal)+' / 2.300 kcal';
+  document.getElementById('prot-val').textContent=Math.round(m.prot)+' / 150 g';
+  document.getElementById('carb-val').textContent=Math.round(m.carb)+' / 240 g';
+  document.getElementById('fat-val').textContent=Math.round(m.fat)+' / 70 g';
+  document.getElementById('agua-val').textContent=m.agua.toFixed(1)+' / 3.0 L';
+  document.getElementById('bar-cal').style.width=p(m.cal,T.cal);
+  document.getElementById('bar-prot2').style.width=p(m.prot,T.prot);
+  document.getElementById('bar-carb').style.width=p(m.carb,T.carb);
+  document.getElementById('bar-fat').style.width=p(m.fat,T.fat);
+  document.getElementById('bar-agua2').style.width=p(m.agua,T.agua);
+}
+async function renderComidaHoy(){
+  var res=await db.from('comidas').select('*').eq('fecha',TODAY).order('created_at');
+  var el=document.getElementById('comida-hoy');
+  if(!res.data||!res.data.length){el.innerHTML='<p class="em">Aún no registraste comidas.</p>';return;}
+  el.innerHTML=res.data.map(function(c){return'<div class="hi"><div class="hd">'+c.tipo_comida+'</div><div class="hb"><div class="fw">'+Math.round(c.calorias||0)+' kcal · '+fmt(c.proteina,0)+'g prot</div><div style="font-size:11px;color:var(--mu)">'+(c.descripcion||'')+'</div></div></div>';}).join('');
+}
+function markMeal(t){var m={'Desayuno':'st-desayuno','Almuerzo':'st-almuerzo','Cena':'st-cena','Batido proteico':'st-batido'};var eid=m[t];if(eid){var el=document.getElementById(eid);if(el){el.textContent='Listo';el.className='tag bgr';}}}
+async function loadSupps(){
+  var res=await db.from('suplementos').select('*').eq('fecha',TODAY);
+  if(!res.data)return;
+  res.data.forEach(function(s){S.supps[s.nombre]=s.tomado;});
+  document.querySelectorAll('.si').forEach(function(el){var k=el.dataset.key;if(S.supps[k]){el.classList.add('taken');el.querySelector('.sc').textContent='✓';}});
+}
+async function toggleSupp(el,key){
+  el.classList.toggle('taken');var taken=el.classList.contains('taken');
+  el.querySelector('.sc').textContent=taken?'✓':'○';S.supps[key]=taken;updateKPIs();
+  await db.from('suplementos').upsert({fecha:TODAY,nombre:key,tomado:taken},{onConflict:'fecha,nombre'});
+}
+async function loadMedidas(){
+  var res=await db.from('medidas_semanales').select('*').order('numero_semana');
+  S.medidas=res.data||[];
+}
+async function saveMedida(){
+  var sem=document.getElementById('med-sem').value;
+  var num=parseInt(sem.replace('Semana ',''));
+  var p={semana:sem,numero_semana:num,fecha:TODAY,peso:parseFloat(document.getElementById('m-peso').value)||null,grasa_corporal:parseFloat(document.getElementById('m-grasa').value)||null,masa_muscular:parseFloat(document.getElementById('m-musc').value)||null,grasa_visceral:parseFloat(document.getElementById('m-visc').value)||null,agua_corporal:parseFloat(document.getElementById('m-agua').value)||null,edad_metabolica:parseInt(document.getElementById('m-edm').value)||null,cintura:parseFloat(document.getElementById('m-cin').value)||null,dolor_lumbar:parseFloat(document.getElementById('m-dl').value)||null,dolor_hombro:parseFloat(document.getElementById('m-dh').value)||null,energia:parseInt(document.getElementById('m-en').value)||null,notas:document.getElementById('m-notas').value.trim(),updated_at:new Date().toISOString()};
+  loading(true);var res=await db.from('medidas_semanales').upsert(p,{onConflict:'semana'});loading(false);
+  if(res.error){toast('Error: '+res.error.message,'var(--rd)');return;}
+  await loadMedidas();renderMedTable();renderCharts();document.getElementById('m-notas').value='';toast('Medidas guardadas');
+}
+function dc(v){return(v||0)>=5?"var(--rd)":(v||0)>=3?"var(--or)":"var(--gr)";}
+function renderMedTable(){
+  var tb=document.getElementById('med-tabla');
+  if(!S.medidas.length){tb.innerHTML='<tr><td colspan="11" class="em">Aqui apareceran tus registros.</td></tr>';return;}
+  var base=S.medidas[0];
+  function df(v,b,low){if(v==null||b==null)return"";var d=v-b;if(Math.abs(d)<0.05)return"";var ok=low?d<0:d>0;return"<span style=color:"+(ok?"var(--gr)":"var(--rd)")+">"+(d>0?"+":"")+(Math.abs(d)<10?d.toFixed(1):Math.round(d))+"</span>";}
+  tb.innerHTML=S.medidas.map(function(m,i){return"<tr><td><strong>"+m.semana+"</strong><br><span style=font-size:10px;color:var(--mu)>"+m.fecha+"</span></td><td>"+fmt(m.peso,1)+(i>0?df(m.peso,base.peso,true):"")+"</td><td>"+fmt(m.grasa_corporal,1)+"%"+(i>0?df(m.grasa_corporal,base.grasa_corporal,true):"")+"</td><td>"+fmt(m.masa_muscular,1)+(i>0?df(m.masa_muscular,base.masa_muscular,false):"")+"</td><td>"+fmt(m.grasa_visceral,1)+(i>0?df(m.grasa_visceral,base.grasa_visceral,true):"")+"</td><td>"+fmt(m.agua_corporal,1)+"%"+(i>0?df(m.agua_corporal,base.agua_corporal,false):"")+"</td><td>"+(m.edad_metabolica||"—")+(i>0?df(m.edad_metabolica,base.edad_metabolica,true):"")+"</td><td>"+fmt(m.cintura,0)+(i>0?df(m.cintura,base.cintura,true):"")+"</td><td><span style=color:"+dc(m.dolor_lumbar)+">"+(m.dolor_lumbar!=null?m.dolor_lumbar:"—")+"/10</span></td><td><span style=color:"+dc(m.dolor_hombro)+">"+(m.dolor_hombro!=null?m.dolor_hombro:"—")+"/10</span></td><td><span style=color:var(--ac)>"+(m.energia!=null?m.energia:"—")+"/10</span></td></tr>";}).join("");
+}
+function renderCharts(){
+  if(S.medidas.length<2)return;
+  var maxP=Math.max.apply(null,S.medidas.map(function(m){return m.peso||0;}));
+  var minP=Math.min.apply(null,S.medidas.filter(function(m){return m.peso;}).map(function(m){return m.peso;}));
+  var rP=(maxP-minP)||1;
+  document.getElementById('chart-peso').innerHTML='<div style="display:flex;align-items:flex-end;gap:5px;height:80px;padding:0 4px">'+S.medidas.map(function(m){var h=m.peso?Math.max(6,((m.peso-minP+1)/(rP+2))*70):6;return'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:9px;color:var(--mu)">'+fmt(m.peso,1)+'</span><div style="width:100%;height:'+h+'px;background:var(--ac);border-radius:3px 3px 0 0;opacity:.8"></div><span style="font-size:9px;color:var(--mu)">S'+m.numero_semana+'</span></div>';}).join('')+'</div><div style="text-align:center;font-size:10px;color:var(--mu);margin-top:5px">Peso (kg)</div>';
+  document.getElementById('chart-dolor').innerHTML='<div style="display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 4px">'+S.medidas.map(function(m){var hL=m.dolor_lumbar!=null?Math.max(3,(m.dolor_lumbar/10)*72):3,hH=m.dolor_hombro!=null?Math.max(3,(m.dolor_hombro/10)*72):3;return'<div style="flex:1;display:flex;align-items:flex-end;gap:2px"><div style="flex:1;height:'+hL+'px;background:var(--rd);border-radius:3px 3px 0 0;opacity:.8"></div><div style="flex:1;height:'+hH+'px;background:var(--or);border-radius:3px 3px 0 0;opacity:.8"></div></div>';}).join('')+'</div><div style="display:flex;gap:14px;justify-content:center;margin-top:5px;font-size:10px;color:var(--mu)"><span><span style="color:var(--rd)">■</span> Lumbar</span><span><span style="color:var(--or)">■</span> Hombro</span></div>';
+}
+async function loadHist(){
+  var logs=await db.from('logs_diarios').select('*').order('fecha',{ascending:false}).limit(30);
+  var ej=await db.from('ejercicios_log').select('*').eq('completado',true).order('fecha',{ascending:false}).limit(30);
+  var le=document.getElementById('hist-logs');
+  le.innerHTML=logs.data&&logs.data.length?logs.data.map(function(l){return'<div class="hi"><div class="hd">'+l.fecha+'</div><div class="hb"><div class="fw">Lumbar:'+(l.dolor_lumbar!=null?l.dolor_lumbar:'—')+'/10 · Hombro:'+(l.dolor_hombro!=null?l.dolor_hombro:'—')+'/10</div><div style="font-size:11px;color:var(--mu)">'+(l.nota||'Sin nota')+'</div></div></div>';}).join(''):'<p class="em">Aún no hay registros.</p>';
+  var ee=document.getElementById('hist-ej');
+  ee.innerHTML=ej.data&&ej.data.length?ej.data.map(function(e){return'<div class="hi"><div class="hd">'+e.fecha+'</div><div class="hb"><div class="fw">'+e.ejercicio_nombre+'</div><div style="font-size:11px;color:var(--mu)">'+(e.dia_semana||'')+' · Sem '+e.semana_num+'</div></div><span class="cbg bgr">✓</span></div>';}).join(''):'<p class="em">Aún no hay ejercicios registrados.</p>';
+}
+function updateKPIs(){
+  var m=S.macros;
+  var cur=getCurrentSemDow();
+  var plan=getPlanDia(cur.sem,cur.dow===0?1:cur.dow);
+  var total=plan.length;
+  var done=plan.filter(function(k){return S.ejLog[k];}).length;
+  var su=Object.values(S.supps).filter(Boolean).length;
+  document.getElementById('kpi-agua').textContent=m.agua.toFixed(1);document.getElementById('bar-agua').style.width=Math.min(100,(m.agua/3)*100)+'%';
+  document.getElementById('kpi-prot').textContent=Math.round(m.prot);document.getElementById('bar-prot').style.width=Math.min(100,(m.prot/150)*100)+'%';
+  document.getElementById('kpi-ej').textContent=done;
+  document.getElementById('kpi-ej-of').textContent='/ '+total+' hoy';
+  document.getElementById('bar-ej').style.width=(total>0?Math.min(100,(done/total)*100):0)+'%';
+  document.getElementById('kpi-su').textContent=su;document.getElementById('bar-su').style.width=Math.min(100,(su/11)*100)+'%';
+}
+
+document.getElementById('today-date').textContent=new Date().toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+init();
+</script>
+</body>
+</html>
